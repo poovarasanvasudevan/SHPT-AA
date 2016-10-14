@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/newGroup"
+        app:showAsAction="never"
+        android:title="New Group" />
+
+    <item
+        android:id="@+id/newBroadcast"
+        app:showAsAction="never"
+        android:title="New Broadcast" />
+
+    <item
+        android:id="@+id/web"
+        app:showAsAction="never"
+        android:title="Miu Web" />
+
+    <item
+        android:id="@+id/status"
+        app:showAsAction="never"
+        android:title="Status" />
+
+    <item
+        android:id="@+id/messageSettings"
+        app:showAsAction="never"
+        android:title="Settings" />
+</menu>

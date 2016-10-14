@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- TabIndicator Attribute -->
+    <declare-styleable name="TabIndicator">
+        <attr name="tab_text_size" format="dimension"/>
+        <attr name="tab_text_color" format="color"/>
+        <attr name="tab_text_selected_color" format="color"/>
+        <attr name="tab_text_disabled_color" format="color"/>
+        <attr name="tab_ripple_color" format="color"/>
+        <attr name="tab_underline_color" format="color"/>
+        <attr name="tab_underline_height" format="dimension"/>
+        <attr name="tab_max_column" format="integer"/>
+    </declare-styleable>
+
+    <!-- RadioButton Attribute -->
+    <declare-styleable name="RadioButton">
+        <attr name="radio_color" format="color"/>
+        <attr name="radio_checked_color" format="color"/>
+    </declare-styleable>
+
+    <!-- CheckBox Attribute -->
+    <declare-styleable name="CheckBox">
+        <attr name="checkbox_color" format="color"/>
+        <attr name="checkbox_checked_color" format="color"/>
+    </declare-styleable>
+
+    <!-- CircleButton Attribute -->
+    <declare-styleable name="CircleButton">
+        <attr name="circle_icon" format="reference"/>
+        <attr name="circle_color" format="color"/>
+        <attr name="circle_shadow_radius" format="float"/>
+        <attr name="circle_shadow_offset_x" format="float"/>
+        <attr name="circle_shadow_offset_y" format="float"/>
+        <attr name="circle_shadow_color" format="color"/>
+    </declare-styleable>
+
+    <!-- PaperButton Attribute -->
+    <declare-styleable name="PaperButton">
+        <attr name="paper_text" format="string"/>
+        <attr name="paper_text_size" format="dimension"/>
+        <attr name="paper_text_color" format="color"/>
+        <attr name="paper_font" format="string"/>
+        <attr name="paper_color" format="color"/>
+        <attr name="paper_corner_radius" format="dimension"/>
+        <attr name="paper_shadow_radius" format="float"/>
+        <attr name="paper_shadow_offset_x" format="float"/>
+        <attr name="paper_shadow_offset_y" format="float"/>
+        <attr name="paper_shadow_color" format="color"/>
+    </declare-styleable>
+
+    <!-- CircularProgress Attribute -->
+    <declare-styleable name="CircularProgress">
+        <attr name="matProg_progressIndeterminate" format="boolean" />
+        <attr name="matProg_barColor" format="color" />
+        <attr name="matProg_rimColor" format="color" />
+        <attr name="matProg_rimWidth" format="dimension" />
+        <attr name="matProg_spinSpeed" format="float" />
+        <attr name="matProg_barSpinCycleTime" format="integer" />
+        <attr name="matProg_circleRadius" format="dimension" />
+        <attr name="matProg_fillRadius" format="boolean" />
+        <attr name="matProg_barWidth" format="dimension" />
+        <attr name="matProg_linearProgress" format="boolean" />
+    </declare-styleable>
+    <declare-styleable name="MaterialButton">
+        <attr name="btn_text" format="string"></attr>
+        <attr name="btn_color" format="color"></attr>
+        <attr name="text_color" format="color"></attr>
+    </declare-styleable>
+</resources>
