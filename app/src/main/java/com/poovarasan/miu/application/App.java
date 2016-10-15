@@ -18,8 +18,9 @@ public class App extends Application {
         Parse.enableLocalDatastore(this);
         Parse.setLogLevel(Parse.LOG_LEVEL_VERBOSE);
         Parse.initialize(new Parse.Configuration.Builder(this)
-                .applicationId("SHPTAPP")
-                .server("http://10.0.2.2:1337/parse")
+                .applicationId("herokuApp")
+                .clientKey(null)
+                .server("https://agile-cliffs-51843.herokuapp.com/parse")
                 .build()
         );
         ParseInstallation
