@@ -12,6 +12,12 @@
         app:showAsAction="never"
         android:title="New Broadcast" />
 
+
+    <item
+        android:id="@+id/favMessage"
+        app:showAsAction="never"
+        android:title="Favorite Message" />
+
     <item
         android:id="@+id/web"
         app:showAsAction="never"
