@@ -1,5 +1,6 @@
 package com.poovarasan.miu.activity;
 
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
@@ -31,6 +32,7 @@ public class Home extends AppCompatActivity implements TabLayout.OnTabSelectedLi
 
         activityHomeBinding.tabLayout.setupWithViewPager(activityHomeBinding.pager);
         activityHomeBinding.tabLayout.setOnTabSelectedListener(this);
+        activityHomeBinding.pager.setCurrentItem(1);
         //
     }
 
@@ -40,10 +42,6 @@ public class Home extends AppCompatActivity implements TabLayout.OnTabSelectedLi
         currentTab = tab.getPosition();
 
         invalidateOptionsMenu();
-    }
-
-    private void changeMenuItem(int position) {
-
     }
 
     @Override
@@ -64,6 +62,16 @@ public class Home extends AppCompatActivity implements TabLayout.OnTabSelectedLi
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.status: {
+                Intent intent = new Intent(Home.this, Status.class);
+                startActivity(intent);
+                finish();
+                break;
+            }
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -73,7 +81,7 @@ public class Home extends AppCompatActivity implements TabLayout.OnTabSelectedLi
         MenuInflater inflater = getMenuInflater();
         menu.clear();
         if (currentTab == 0) {
-            inflater.inflate(R.menu.call_menu, menu);  //  menu for photospec.
+            inflater.inflate(R.menu.call_menu, menu);     // menu for photospec.
         } else if (currentTab == 1) {
             inflater.inflate(R.menu.message_menu, menu);  // menu for songspec
         } else {

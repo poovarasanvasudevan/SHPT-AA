@@ -15,7 +15,7 @@ import com.poovarasan.miu.fragments.Message;
 public class PagerAdapter extends FragmentPagerAdapter {
 
     int tabCount;
-    private String tabTitles[] = new String[] { "Calls", "Message", "Contacts" };
+    private String tabTitles[] = new String[] { "Calls", "Chat", "Contacts" };
     public PagerAdapter(FragmentManager fm,int tabCount) {
         super(fm);
         this.tabCount = tabCount;
