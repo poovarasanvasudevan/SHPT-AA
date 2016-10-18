@@ -2,16 +2,21 @@ package com.poovarasan.miu.activity;
 
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.poovarasan.miu.R;
 import com.poovarasan.miu.adapter.PagerAdapter;
+import com.poovarasan.miu.application.App;
 import com.poovarasan.miu.databinding.ActivityHomeBinding;
+
+import java.util.List;
 
 
 public class Home extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
@@ -34,7 +39,33 @@ public class Home extends AppCompatActivity implements TabLayout.OnTabSelectedLi
         activityHomeBinding.tabLayout.setOnTabSelectedListener(this);
         activityHomeBinding.pager.setCurrentItem(1);
         //
+
+
     }
+
+    class QueueMessage extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+
+            Log.i("Messages", "xxxxx");
+            long v = App.getRedis().rpush("mychannelq", "Hello");
+            Log.i("queuemessage", v + "");
+            return null;
+        }
+    }
+
+    class QPopMessage extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+
+            List<String> bpop = App.getRedis().blpop(0, "mychannelq");
+            Log.i("BRPOP", +bpop.size() + "");
+            return null;
+        }
+    }
+
 
     @Override
     public void onTabSelected(TabLayout.Tab tab) {
@@ -68,6 +99,16 @@ public class Home extends AppCompatActivity implements TabLayout.OnTabSelectedLi
                 Intent intent = new Intent(Home.this, Status.class);
                 startActivity(intent);
                 finish();
+                break;
+            }
+
+            case R.id.newBroadcast: {
+                new QPopMessage().execute();
+                break;
+            }
+
+            case R.id.newGroup: {
+                new QueueMessage().execute();
                 break;
             }
         }

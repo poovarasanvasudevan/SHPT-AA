@@ -59,12 +59,18 @@
             </intent-filter>
         </receiver>
 
+        <service android:name=".service.RedisService"></service>
+        <receiver android:name=".receiver.RedisReceiver">
+        </receiver>
+
         <!--         IMPORTANT: Change "YOUR_SENDER_ID" to your GCM Sender Id. -->
         <meta-data
             android:name="com.parse.push.gcm_sender_id"
             android:value="id:749246961236" />
 
-        <activity android:name=".activity.Status" android:windowSoftInputMode="adjustPan"></activity>
+        <activity
+            android:name=".activity.Status"
+            android:windowSoftInputMode="adjustPan"></activity>
     </application>
 
 </manifest>

@@ -38,5 +38,6 @@ dependencies {
 
     compile 'org.jokar:permissiondispatcher:2.0.8'
     apt 'org.jokar:permissiondispatcher-processor:2.0.8'
+    compile group: 'redis.clients', name: 'jedis', version: '2.9.0'
     testCompile 'junit:junit:4.12'
 }
