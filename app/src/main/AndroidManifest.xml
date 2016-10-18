@@ -61,6 +61,7 @@
 
         <service android:name=".service.RedisService"></service>
         <receiver android:name=".receiver.RedisReceiver">
+            <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
         </receiver>
 
         <!--         IMPORTANT: Change "YOUR_SENDER_ID" to your GCM Sender Id. -->

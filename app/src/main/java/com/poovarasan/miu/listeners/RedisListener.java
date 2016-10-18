@@ -1,7 +1,12 @@
 package com.poovarasan.miu.listeners;
 
+import android.app.Notification;
+import android.content.Context;
 import android.util.Log;
 
+import com.poovarasan.miu.R;
+
+import br.com.goncalves.pugnotification.notification.PugNotification;
 import redis.clients.jedis.Client;
 import redis.clients.jedis.JedisPubSub;
 
@@ -10,9 +15,15 @@ import redis.clients.jedis.JedisPubSub;
  */
 
 public class RedisListener extends JedisPubSub {
+    Context context;
+    public RedisListener(Context context) {
+        this.context = context;
+    }
+
     @Override
     public void onMessage(String channel, String message) {
         Log.i(channel, message);
+        notifyMe(message,context);
     }
 
     @Override
@@ -98,5 +109,17 @@ public class RedisListener extends JedisPubSub {
     @Override
     public int getSubscribedChannels() {
         return super.getSubscribedChannels();
+    }
+
+    public void notifyMe(String message, Context context){
+        PugNotification.with(context)
+                .load()
+                .title("New Notification")
+                .message(message)
+                .smallIcon(R.drawable.notification)
+                .largeIcon(R.drawable.notification_big)
+                .flags(Notification.DEFAULT_ALL)
+                .simple()
+                .build();
     }
 }
