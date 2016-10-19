@@ -39,9 +39,7 @@ public class App extends Application {
 
 
     public static Jedis getRedis() {
-        if (jedis == null) {
-            jedis = new Jedis("10.0.2.2");
-        }
-        return jedis;
+        return new Jedis("10.0.2.2");
     }
+
 }

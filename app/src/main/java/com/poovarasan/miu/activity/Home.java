@@ -5,6 +5,7 @@ import android.databinding.DataBindingUtil;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
+import android.support.v4.os.AsyncTaskCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -55,14 +56,17 @@ public class Home extends AppCompatActivity implements TabLayout.OnTabSelectedLi
         }
     }
 
-    class QPopMessage extends AsyncTask<Void, Void, Void> {
+    class QPopMessage extends AsyncTask<Void, Void, List<String>> {
         @Override
-        protected Void doInBackground(Void... voids) {
+        protected List<String> doInBackground(Void... voids) {
 
-
-            List<String> bpop = App.getRedis().blpop(0, "mychannelq");
-            Log.i("BRPOP", +bpop.size() + "");
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(List<String> strings) {
+
+            super.onPostExecute(strings);
         }
     }
 
@@ -103,7 +107,7 @@ public class Home extends AppCompatActivity implements TabLayout.OnTabSelectedLi
             }
 
             case R.id.newBroadcast: {
-                new QPopMessage().execute();
+                AsyncTaskCompat.executeParallel(new QPopMessage(), null);
                 break;
             }
 
