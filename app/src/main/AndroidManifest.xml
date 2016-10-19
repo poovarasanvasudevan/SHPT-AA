@@ -67,7 +67,7 @@
             <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
         </receiver>
 
-        <!--         IMPORTANT: Change "YOUR_SENDER_ID" to your GCM Sender Id. -->
+        <!--  IMPORTANT: Change "YOUR_SENDER_ID" to your GCM Sender Id. -->
         <meta-data
             android:name="com.parse.push.gcm_sender_id"
             android:value="id:749246961236" />
