@@ -1,12 +1,15 @@
 package com.poovarasan.miu.activity;
 
+import android.app.SearchManager;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.os.AsyncTaskCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -131,7 +134,13 @@ public class Home extends AppCompatActivity implements TabLayout.OnTabSelectedLi
             inflater.inflate(R.menu.message_menu, menu);  // menu for songspec
         } else {
             inflater.inflate(R.menu.contact_menu, menu);  // menu for songspec
+
+            final SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
+            SearchManager searchManager = (SearchManager) getSystemService(SEARCH_SERVICE);
+            searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+
         }
+
 
         return super.onPrepareOptionsMenu(menu);
     }

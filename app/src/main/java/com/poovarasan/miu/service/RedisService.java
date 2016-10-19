@@ -24,6 +24,7 @@ import com.poovarasan.miu.listeners.RedisListener;
 import java.util.List;
 
 import br.com.goncalves.pugnotification.notification.PugNotification;
+import br.com.goncalves.pugnotification.notification.Simple;
 
 /**
  * Created by poovarasanv on 18/10/16.
@@ -88,23 +89,27 @@ public class RedisService extends Service {
         @Override
         protected Void doInBackground(Void... voids) {
 
-            Log.i("Hit", "Hit");
-            List<String> messageQueue = App.getRedis().lrange(ParseUser.getCurrentUser().getUsername() + ".messagequeue", 0, -1);
-            for (String message : messageQueue) {
-                App.getRedis().rpop(ParseUser.getCurrentUser().getUsername() + ".messagequeue");
+            if (ParseUser.getCurrentUser() != null) {
+                Log.i("Hit", "Hit");
+                Simple simple = null;
+                List<String> messageQueue = App.getRedis().lrange(ParseUser.getCurrentUser().getUsername() + ".messagequeue", 0, -1);
+                for (String message : messageQueue) {
+                    App.getRedis().rpop(ParseUser.getCurrentUser().getUsername() + ".messagequeue");
 
-                String fullMessage = "\n" + message;
+                    String fullMessage = "\n" + message;
 
-                PugNotification.with(getApplicationContext())
-                        .load()
-                        .title("New Notification")
-                        .message(fullMessage)
-                        .smallIcon(R.drawable.notification)
-                        .largeIcon(R.drawable.notification_big)
-                        .flags(Notification.DEFAULT_ALL)
-                        .vibrate(new long[]{1000L, 200L, 300L})
-                        .simple()
-                        .build();
+                    simple = PugNotification.with(getApplicationContext())
+                            .load()
+                            .title("New Notification")
+                            .message(fullMessage)
+                            .smallIcon(R.drawable.notification)
+                            .largeIcon(R.drawable.notification_big)
+                            .flags(Notification.DEFAULT_ALL)
+                            .vibrate(new long[]{1000L, 200L, 300L})
+                            .simple();
+                }
+                if (simple != null)
+                    simple.build();
             }
             return null;
         }

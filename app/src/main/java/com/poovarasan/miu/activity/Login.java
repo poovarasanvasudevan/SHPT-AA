@@ -13,6 +13,7 @@ import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.poovarasan.miu.R;
 import com.poovarasan.miu.databinding.ActivityLoginBinding;
+import com.poovarasan.miu.service.RedisService;
 
 public class Login extends AppCompatActivity {
 
@@ -42,6 +43,10 @@ public class Login extends AppCompatActivity {
                 ParseUser.logInInBackground(activityLoginBinding.username.getText().toString(), activityLoginBinding.password.getText().toString(), new LogInCallback() {
                     public void done(ParseUser user, ParseException e) {
                         if (user != null) {
+
+                            Intent intent = new Intent(Login.this, RedisService.class);
+                            startService(intent);
+
                             Intent i = new Intent(Login.this, Home.class);
                             startActivity(i);
                             finish();
