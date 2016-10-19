@@ -138,6 +138,18 @@ public class Home extends AppCompatActivity implements TabLayout.OnTabSelectedLi
             final SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
             SearchManager searchManager = (SearchManager) getSystemService(SEARCH_SERVICE);
             searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    return false;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    Log.i("New Text", newText);
+                    return false;
+                }
+            });
 
         }
 
