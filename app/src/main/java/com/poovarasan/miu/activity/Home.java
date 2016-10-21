@@ -40,8 +40,6 @@ public class Home extends AppCompatActivity implements TabLayout.OnTabSelectedLi
         activityHomeBinding.pager.setCurrentItem(1);
         activityHomeBinding.pager.setOffscreenPageLimit(3);
         //
-
-
     }
 
     class QueueMessage extends AsyncTask<Void, Void, Void> {
