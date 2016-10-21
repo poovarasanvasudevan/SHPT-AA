@@ -42,13 +42,9 @@
                             android:layout_height="wrap_content"
                             android:text="Your Current Status" />
 
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:layout_marginTop="4dp"
-                            android:background="#ccc" />
 
                         <android.support.v7.widget.AppCompatEditText
+                            android:id="@+id/myStatus"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="3dp"
