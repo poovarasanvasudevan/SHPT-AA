@@ -40,11 +40,8 @@ public class Status extends AppCompatActivity {
         activityStatusBinding.myStatus.setSelectAllOnFocus(true);
 
 
-
         EmojIconActions emojIcon = new EmojIconActions(this, activityStatusBinding.myStatus, activityStatusBinding.myStatus, activityStatusBinding.emojiBtn);
         emojIcon.ShowEmojIcon();
-        emojIcon.setUseSystemEmoji(true);
-
     }
 
     @Override
@@ -64,7 +61,6 @@ public class Status extends AppCompatActivity {
                 ParseUser user = ParseUser.getCurrentUser();
                 user.put("status", status);
                 user.saveEventually();
-
 
 
                 ParseObject parseObject = ParseObject.create("Status");
