@@ -14,6 +14,7 @@ import com.parse.ParseUser;
 import com.poovarasan.miu.R;
 import com.poovarasan.miu.databinding.ActivityLoginBinding;
 import com.poovarasan.miu.service.RedisService;
+import com.poovarasan.miu.sync.SyncService;
 
 public class Login extends AppCompatActivity {
 
@@ -46,6 +47,9 @@ public class Login extends AppCompatActivity {
 
                             Intent intent = new Intent(Login.this, RedisService.class);
                             startService(intent);
+
+                            Intent intent2 = new Intent(Login.this, SyncService.class);
+                            startService(intent2);
 
                             Intent i = new Intent(Login.this, Home.class);
                             startActivity(i);

@@ -1,24 +1,25 @@
 package com.poovarasan.miu.activity;
 
-import android.app.SearchManager;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.os.AsyncTaskCompat;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.poovarasan.miu.R;
 import com.poovarasan.miu.adapter.PagerAdapter;
 import com.poovarasan.miu.application.App;
 import com.poovarasan.miu.databinding.ActivityHomeBinding;
+import com.poovarasan.miu.sync.Sync;
 
 import java.util.List;
 
@@ -78,8 +79,6 @@ public class Home extends AppCompatActivity implements TabLayout.OnTabSelectedLi
     public void onTabSelected(TabLayout.Tab tab) {
         activityHomeBinding.pager.setCurrentItem(tab.getPosition());
         currentTab = tab.getPosition();
-
-        invalidateOptionsMenu();
     }
 
     @Override
@@ -118,42 +117,44 @@ public class Home extends AppCompatActivity implements TabLayout.OnTabSelectedLi
                 new QueueMessage().execute();
                 break;
             }
+
+            case R.id.refresh: {
+
+                AsyncTaskCompat.executeParallel(new RefreshUser(), null);
+                break;
+            }
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
+    class RefreshUser extends AsyncTask<Void, Void, Void> {
 
-        MenuInflater inflater = getMenuInflater();
-        menu.clear();
-        if (currentTab == 0) {
-            inflater.inflate(R.menu.call_menu, menu);     // menu for photospec.
-        } else if (currentTab == 1) {
-            inflater.inflate(R.menu.message_menu, menu);  // menu for songspec
-        } else {
-            inflater.inflate(R.menu.contact_menu, menu);  // menu for songspec
+        @Override
+        protected Void doInBackground(Void... voids) {
 
-            final SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
-            SearchManager searchManager = (SearchManager) getSystemService(SEARCH_SERVICE);
-            searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            Sync sync = new Sync(getApplicationContext());
+            sync.makeSync();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+
+            ParseQuery query = ParseQuery.getQuery("MyUsers");
+            query.fromLocalDatastore();
+            query.findInBackground(new FindCallback<ParseObject>() {
                 @Override
-                public boolean onQueryTextSubmit(String query) {
-                    return false;
-                }
+                public void done(List<ParseObject> objects, ParseException e) {
 
-                @Override
-                public boolean onQueryTextChange(String newText) {
-                    Log.i("New Text", newText);
-                    return false;
+                    for (ParseObject parseObject : objects) {
+                        Log.i("Parse Sync Poosan", parseObject.getString("NUMBER"));
+                    }
                 }
             });
 
+            super.onPostExecute(aVoid);
         }
-
-
-        return super.onPrepareOptionsMenu(menu);
     }
+
 }

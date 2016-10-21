@@ -6,6 +6,7 @@ import android.content.Intent;
 import com.parse.Parse;
 import com.parse.ParseInstallation;
 import com.poovarasan.miu.service.RedisService;
+import com.poovarasan.miu.sync.SyncReceiver;
 
 import redis.clients.jedis.Jedis;
 
@@ -20,10 +21,10 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-
-        Parse.enableLocalDatastore(this);
         Parse.setLogLevel(Parse.LOG_LEVEL_VERBOSE);
+        Parse.enableLocalDatastore(this);
         Parse.initialize(new Parse.Configuration.Builder(this)
+                .enableLocalDataStore()
                 .applicationId("herokuApp")
                 .clientKey(null)
                 .server("https://agile-cliffs-51843.herokuapp.com/parse")
@@ -34,6 +35,9 @@ public class App extends Application {
                 .saveInBackground();
 
         Intent intent = new Intent(this, RedisService.class);
+        startService(intent);
+
+        Intent intent1 = new Intent(this, SyncReceiver.class);
         startService(intent);
     }
 

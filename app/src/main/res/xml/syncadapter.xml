@@ -29,7 +29,9 @@
 -->
 
 <sync-adapter xmlns:android="http://schemas.android.com/apk/res/android"
-    android:accountType="com.poovarasan.miu"
-    android:contentAuthority="com.android.contacts"
-    android:supportsUploading="false"
-    android:userVisible="true" />
+    android:contentAuthority="com.poovarasan.miu"
+    android:accountType="com.poovarasan.miu.sync"
+    android:userVisible="true"
+    android:allowParallelSyncs="false"
+    android:isAlwaysSyncable="true"
+    android:supportsUploading="true"/>
