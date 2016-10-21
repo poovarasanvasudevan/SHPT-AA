@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.poovarasan.miu">
 
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -35,7 +35,7 @@
         <activity android:name=".activity.Home" />
 
         <service android:name="com.parse.PushService" />
-        <service android:name=".sync.SyncService"></service>
+        <service android:name=".sync.SyncService" />
 
         <receiver
             android:name=".receiver.GCMReceiver"
@@ -55,21 +55,21 @@
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                 <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
 
-                <!--                 IMPORTANT: Change "com.parse.starter" to match your app's package name. -->
+                <!-- IMPORTANT: Change "com.parse.starter" to match your app's package name. -->
                 <category android:name="com.poovarasan.miu" />
             </intent-filter>
         </receiver>
 
-        <service android:name=".service.RedisService"></service>
+        <service android:name=".service.RedisService" />
+
         <receiver android:name=".receiver.RedisReceiver">
             <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
         </receiver>
-
         <receiver android:name=".sync.SyncReceiver">
             <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
         </receiver>
 
-        <!--  IMPORTANT: Change "YOUR_SENDER_ID" to your GCM Sender Id. -->
+        <!-- IMPORTANT: Change "YOUR_SENDER_ID" to your GCM Sender Id. -->
         <meta-data
             android:name="com.parse.push.gcm_sender_id"
             android:value="id:749246961236" />
@@ -77,8 +77,8 @@
         <activity
             android:name=".activity.Status"
             android:label="Status"
-            android:windowSoftInputMode="adjustPan"></activity>
-
+            android:windowSoftInputMode="adjustPan" />
+        <activity android:name=".activity.Settings"></activity>
     </application>
 
 </manifest>

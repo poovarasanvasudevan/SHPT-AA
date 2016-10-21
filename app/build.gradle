@@ -23,7 +23,9 @@ android {
         enabled = true
     }
 }
-
+repositories {
+    maven { url "https://dl.bintray.com/hani-momanii/maven"}
+}
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
@@ -47,5 +49,6 @@ dependencies {
     }
     compile 'com.mikepenz:fastadapter-extensions:1.8.0@aar'
     compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
+    compile 'hani.momanii.supernova_emoji_library:supernova-emoji-library:0.0.2'
     testCompile 'junit:junit:4.12'
 }

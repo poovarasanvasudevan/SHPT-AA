@@ -7,8 +7,8 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:background="@color/md_white_1000"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/md_white_1000">
 
         <LinearLayout
             android:id="@+id/contactPermission"
@@ -34,9 +34,15 @@
         </LinearLayout>
 
 
-        <android.support.v7.widget.RecyclerView
+        <android.support.v4.widget.SwipeRefreshLayout
             android:layout_width="match_parent"
-            android:id="@+id/allcontacts"
-            android:layout_height="match_parent" />
+            android:id="@+id/contactRefresh"
+            android:layout_height="match_parent">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/allcontacts"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </android.support.v4.widget.SwipeRefreshLayout>
     </RelativeLayout>
 </layout>

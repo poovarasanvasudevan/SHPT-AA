@@ -11,15 +11,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.parse.FindCallback;
-import com.parse.ParseException;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
 import com.poovarasan.miu.R;
 import com.poovarasan.miu.adapter.PagerAdapter;
 import com.poovarasan.miu.application.App;
 import com.poovarasan.miu.databinding.ActivityHomeBinding;
-import com.poovarasan.miu.sync.Sync;
 
 import java.util.List;
 
@@ -43,6 +38,7 @@ public class Home extends AppCompatActivity implements TabLayout.OnTabSelectedLi
         activityHomeBinding.tabLayout.setupWithViewPager(activityHomeBinding.pager);
         activityHomeBinding.tabLayout.setOnTabSelectedListener(this);
         activityHomeBinding.pager.setCurrentItem(1);
+        activityHomeBinding.pager.setOffscreenPageLimit(3);
         //
 
 
@@ -104,7 +100,6 @@ public class Home extends AppCompatActivity implements TabLayout.OnTabSelectedLi
             case R.id.status: {
                 Intent intent = new Intent(Home.this, Status.class);
                 startActivity(intent);
-                finish();
                 break;
             }
 
@@ -118,43 +113,16 @@ public class Home extends AppCompatActivity implements TabLayout.OnTabSelectedLi
                 break;
             }
 
-            case R.id.refresh: {
-
-                AsyncTaskCompat.executeParallel(new RefreshUser(), null);
+            case R.id.settings: {
+                Intent intent = new Intent(Home.this, Settings.class);
+                startActivity(intent);
                 break;
             }
+
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    class RefreshUser extends AsyncTask<Void, Void, Void> {
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-
-            Sync sync = new Sync(getApplicationContext());
-            sync.makeSync();
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-
-            ParseQuery query = ParseQuery.getQuery("MyUsers");
-            query.fromLocalDatastore();
-            query.findInBackground(new FindCallback<ParseObject>() {
-                @Override
-                public void done(List<ParseObject> objects, ParseException e) {
-
-                    for (ParseObject parseObject : objects) {
-                        Log.i("Parse Sync Poosan", parseObject.getString("NUMBER"));
-                    }
-                }
-            });
-
-            super.onPostExecute(aVoid);
-        }
-    }
 
 }

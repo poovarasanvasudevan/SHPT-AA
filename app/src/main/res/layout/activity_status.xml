@@ -30,30 +30,43 @@
                     android:layout_height="wrap_content"
                     app:cardCornerRadius="0dp">
 
-                    <LinearLayout
+                    <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:padding="10dp">
 
                         <android.support.v7.widget.AppCompatTextView
+                            android:id="@+id/dummy"
                             style="@style/TextAppearance.AppCompat.Small"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="Your Current Status" />
 
 
-                        <android.support.v7.widget.AppCompatEditText
+                        <hani.momanii.supernova_emoji_library.Helper.EmojiconEditText
                             android:id="@+id/myStatus"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:layout_below="@+id/dummy"
                             android:layout_marginTop="3dp"
                             android:background="@drawable/et"
                             android:gravity="top"
                             android:inputType="textMultiLine"
                             android:maxHeight="150dp"
-                            android:minHeight="70dp" />
-                    </LinearLayout>
+                            android:minHeight="70dp"
+                            app:emojiconSize="28sp" />
+
+
+                        <ImageButton
+                            android:layout_width="40dp"
+                            android:id="@+id/emoji_btn"
+                            android:layout_height="40dp"
+                            android:layout_below="@+id/dummy"
+                            android:src="@drawable/ic_smile_o"
+                            android:background="@color/transparent"
+                            android:layout_alignParentRight="true" />
+                    </RelativeLayout>
                 </android.support.v7.widget.CardView>
 
 

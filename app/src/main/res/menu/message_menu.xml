@@ -29,7 +29,7 @@
         android:title="Status" />
 
     <item
-        android:id="@+id/messageSettings"
+        android:id="@+id/settings"
         app:showAsAction="never"
         android:title="Settings" />
 </menu>

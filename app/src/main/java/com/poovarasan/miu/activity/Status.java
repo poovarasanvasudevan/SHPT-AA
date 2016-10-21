@@ -1,6 +1,5 @@
 package com.poovarasan.miu.activity;
 
-import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -9,14 +8,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
 import com.poovarasan.miu.R;
 import com.poovarasan.miu.databinding.ActivityStatusBinding;
 
 import java.util.Date;
+
+import hani.momanii.supernova_emoji_library.Actions.EmojIconActions;
 
 public class Status extends AppCompatActivity {
 
@@ -40,6 +39,12 @@ public class Status extends AppCompatActivity {
         activityStatusBinding.myStatus.setText(status);
         activityStatusBinding.myStatus.setSelectAllOnFocus(true);
 
+
+
+        EmojIconActions emojIcon = new EmojIconActions(this, activityStatusBinding.myStatus, activityStatusBinding.myStatus, activityStatusBinding.emojiBtn);
+        emojIcon.ShowEmojIcon();
+        emojIcon.setUseSystemEmoji(true);
+
     }
 
     @Override
@@ -51,8 +56,6 @@ public class Status extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            Intent i = new Intent(Status.this, Home.class);
-            startActivity(i);
             finish();
         }
         if (item.getItemId() == R.id.statusUpdate) {
@@ -60,20 +63,16 @@ public class Status extends AppCompatActivity {
             if (status.length() > 0) {
                 ParseUser user = ParseUser.getCurrentUser();
                 user.put("status", status);
-                user.saveEventually(new SaveCallback() {
-                    @Override
-                    public void done(ParseException e) {
-                        if (e == null) {
-                            Toast.makeText(getApplicationContext(), "Status Updated Succesfully", Toast.LENGTH_LONG).show();
+                user.saveEventually();
 
-                            ParseObject parseObject = ParseObject.create("Status");
-                            parseObject.put("status", status);
-                            parseObject.put("updated", new Date());
-                            parseObject.put("active", true);
-                            parseObject.pinInBackground();
-                        }
-                    }
-                });
+
+
+                ParseObject parseObject = ParseObject.create("Status");
+                parseObject.put("status", status);
+                parseObject.put("updated", new Date());
+                parseObject.put("active", true);
+                parseObject.pinInBackground();
+                Toast.makeText(getApplicationContext(), "Status Updated Succesfully", Toast.LENGTH_LONG).show();
 
 
             } else {

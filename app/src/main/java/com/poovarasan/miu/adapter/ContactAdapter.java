@@ -1,17 +1,17 @@
 package com.poovarasan.miu.adapter;
 
-import android.graphics.Bitmap;
-import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.amulyakhare.textdrawable.TextDrawable;
 import com.mikepenz.fastadapter.items.AbstractItem;
 import com.poovarasan.miu.R;
 
 import java.util.List;
+
+import hani.momanii.supernova_emoji_library.Helper.EmojiconTextView;
 
 /**
  * Created by poovarasanv on 20/10/16.
@@ -19,20 +19,20 @@ import java.util.List;
 
 public class ContactAdapter extends AbstractItem<ContactAdapter, ContactAdapter.ViewHolder> {
 
-    Bitmap image;
+    Drawable image;
     String name, status;
 
-    public ContactAdapter(Bitmap image, String name, String status) {
+    public ContactAdapter(Drawable image, String name, String status) {
         this.image = image;
         this.name = name;
         this.status = status;
     }
 
-    public Bitmap getImage() {
+    public Drawable getImage() {
         return image;
     }
 
-    public void setImage(Bitmap image) {
+    public void setImage(Drawable image) {
         this.image = image;
     }
 
@@ -67,10 +67,12 @@ public class ContactAdapter extends AbstractItem<ContactAdapter, ContactAdapter.
         super.bindView(holder, payloads);
 
 
-        TextDrawable drawable2 = TextDrawable.builder()
-                .buildRound("A", Color.parseColor("#3d5997"));
+        holder.contact_image.setImageDrawable(image);
 
-        holder.contact_image.setImageDrawable(drawable2);
+        if (status.length() > 20)
+            status = status.substring(0, 20) + "...";
+
+
         holder.contact_number.setText(status);
         holder.contact_name.setText(name);
     }
@@ -78,14 +80,15 @@ public class ContactAdapter extends AbstractItem<ContactAdapter, ContactAdapter.
 
     protected static class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView contact_name, contact_number;
+        TextView contact_name;
+        EmojiconTextView contact_number;
         ImageView contact_image;
 
         public ViewHolder(View itemView) {
             super(itemView);
 
             this.contact_name = (TextView) itemView.findViewById(R.id.contact_name);
-            this.contact_number = (TextView) itemView.findViewById(R.id.contact_number);
+            this.contact_number = (EmojiconTextView) itemView.findViewById(R.id.contact_number);
             this.contact_image = (ImageView) itemView.findViewById(R.id.contact_image);
         }
     }
