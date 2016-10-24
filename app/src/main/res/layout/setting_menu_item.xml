@@ -20,9 +20,9 @@
                 android:id="@+id/menu_icon"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:foregroundTint="#555"
-                android:tint="#555"
-                android:layout_gravity="center_vertical"
+                android:foregroundTint="?colorPrimary"
+                android:tint="?colorPrimary"
+                android:gravity="center"
                 android:padding="12dp" />
 
             <TextView
@@ -31,6 +31,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginLeft="20dp"
+                android:textColor="#000"
                 android:gravity="center_vertical" />
         </LinearLayout>
     </com.balysv.materialripple.MaterialRippleLayout>
