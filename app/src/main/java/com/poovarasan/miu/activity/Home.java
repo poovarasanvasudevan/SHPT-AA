@@ -1,5 +1,6 @@
 package com.poovarasan.miu.activity;
 
+import android.content.ComponentName;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.AsyncTask;
@@ -15,13 +16,21 @@ import com.poovarasan.miu.R;
 import com.poovarasan.miu.adapter.PagerAdapter;
 import com.poovarasan.miu.application.App;
 import com.poovarasan.miu.databinding.ActivityHomeBinding;
+import com.poovarasan.miu.sync.ContactSyncService;
 
 import java.util.List;
+
+import me.tatarka.support.job.JobInfo;
+import me.tatarka.support.job.JobScheduler;
 
 
 public class Home extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
 
+    private static final int JOB_ID = 4090;
+    private static final long POLL_FREQUENCY = 1000 * 60 * 60 * 1;
+   // private static final long POLL_FREQUENCY = 1000 * 6;
     ActivityHomeBinding activityHomeBinding;
+    private JobScheduler mJobScheduler;
     int currentTab;
 
     @Override
@@ -46,7 +55,19 @@ public class Home extends AppCompatActivity implements TabLayout.OnTabSelectedLi
         activityHomeBinding.tabLayout.setOnTabSelectedListener(this);
         activityHomeBinding.pager.setCurrentItem(1);
         activityHomeBinding.pager.setOffscreenPageLimit(3);
+
+        setupJob();
         //
+    }
+
+    private void setupJob() {
+        mJobScheduler = JobScheduler.getInstance(this);
+        JobInfo.Builder builder = new JobInfo.Builder(JOB_ID, new ComponentName(this, ContactSyncService.class));
+        //set periodic polling that needs net connection and works across device reboots
+        builder.setPeriodic(POLL_FREQUENCY)
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)
+                .setPersisted(true);
+        mJobScheduler.schedule(builder.build());
     }
 
     class QueueMessage extends AsyncTask<Void, Void, Void> {

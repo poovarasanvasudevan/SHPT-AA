@@ -8,7 +8,6 @@ import com.parse.Parse;
 import com.parse.ParseInstallation;
 import com.parse.ParseUser;
 import com.poovarasan.miu.service.RedisService;
-import com.poovarasan.miu.sync.SyncReceiver;
 
 import redis.clients.jedis.Jedis;
 
@@ -39,8 +38,6 @@ public class App extends Application {
         Intent intent = new Intent(this, RedisService.class);
         startService(intent);
 
-        Intent intent1 = new Intent(this, SyncReceiver.class);
-        startService(intent);
     }
 
     public static void setOnline() {
