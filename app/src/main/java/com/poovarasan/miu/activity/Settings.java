@@ -1,20 +1,31 @@
 package com.poovarasan.miu.activity;
 
 import android.databinding.DataBindingUtil;
-import android.support.v7.app.AppCompatActivity;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.mikepenz.fastadapter.adapters.FastItemAdapter;
 import com.parse.ParseUser;
 import com.poovarasan.miu.R;
+import com.poovarasan.miu.adapter.SettingMenuAdapter;
 import com.poovarasan.miu.databinding.ActivitySettingsBinding;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Settings extends AppCompatActivity {
 
     ActivitySettingsBinding activitySettingsBinding;
     Toolbar toolbar;
+
+    String[] title;
+    Drawable[] icons;
+    FastItemAdapter<SettingMenuAdapter> fastAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,12 +41,47 @@ public class Settings extends AppCompatActivity {
         ParseUser parseUser = ParseUser.getCurrentUser();
         String status = parseUser.getString("status");
 
-        if (status.length() > 20)
-            status = status.substring(0, 20) + "...";
+        if (status.length() > 30)
+            status = status.substring(0, 30) + "...";
 
+
+        LinearLayoutManager llm = new LinearLayoutManager(this);
+        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        activitySettingsBinding.settingMenuList.setLayoutManager(llm);
 
         activitySettingsBinding.displayStatus.setText(status);
         activitySettingsBinding.displayName.setText("Poovarasan Vasudevan");
+
+        title = new String[]{
+                "Accounts",
+                "Chats",
+                "Notification",
+                "Data Usage",
+                "Contacts",
+                "Storage",
+                "About and Help",
+        };
+
+
+        icons = new Drawable[]{
+                getResources().getDrawable(R.drawable.ic_account_circle),
+                getResources().getDrawable(R.drawable.ic_chat),
+                getResources().getDrawable(R.drawable.ic_notifications),
+                getResources().getDrawable(R.drawable.ic_data_usage),
+                getResources().getDrawable(R.drawable.ic_contacts),
+                getResources().getDrawable(R.drawable.ic_database),
+                getResources().getDrawable(R.drawable.ic_help)
+        };
+
+        List<SettingMenuAdapter> settingMenuAdapters = new ArrayList<>();
+        for (int i = 0; i < title.length; i++) {
+            settingMenuAdapters.add(new SettingMenuAdapter(icons[i], title[i]));
+        }
+
+        fastAdapter = new FastItemAdapter<>();
+        activitySettingsBinding.settingMenuList.setAdapter(fastAdapter);
+        fastAdapter.add(settingMenuAdapters);
+
     }
 
     @Override

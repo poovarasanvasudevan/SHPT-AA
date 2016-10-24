@@ -7,6 +7,7 @@
         <attr name="civ_fill_color" format="color" />
     </declare-styleable>
     <item name="contact_adapter" type="id"></item>
+    <item name="menu_adapter" type="id"></item>
     <!-- TabIndicator Attribute -->
     <declare-styleable name="TabIndicator">
         <attr name="tab_text_size" format="dimension"/>

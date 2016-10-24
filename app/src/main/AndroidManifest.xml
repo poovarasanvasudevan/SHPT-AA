@@ -78,7 +78,7 @@
             android:name=".activity.Status"
             android:label="Status"
             android:windowSoftInputMode="adjustPan" />
-        <activity android:name=".activity.Settings"></activity>
+        <activity android:name=".activity.Settings" android:label="Settings"></activity>
     </application>
 
 </manifest>

@@ -167,7 +167,7 @@ public class Contacts extends Fragment {
                 fastAdapter.withFilterPredicate(new IItemAdapter.Predicate<ContactAdapter>() {
                     @Override
                     public boolean filter(ContactAdapter item, CharSequence constraint) {
-                        return !item.getName().toLowerCase().contains(String.valueOf(constraint).toLowerCase());
+                        return !item.getName().toLowerCase().contains(String.valueOf(constraint).toLowerCase().trim());
                     }
                 });
                 return false;
