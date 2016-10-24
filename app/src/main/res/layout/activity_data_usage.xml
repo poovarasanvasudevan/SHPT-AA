@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <RelativeLayout
+        android:id="@+id/activity_data_usage"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="com.poovarasan.miu.activity.DataUsage">
+
+
+        <include
+            android:id="@+id/toolbarinclude"
+            layout="@layout/toolbar" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/toolbarinclude">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:gravity="center_horizontal"
+                android:text="2.3 MB"
+                android:textSize="50dp"
+                android:id="@+id/totalUsage"
+                android:layout_marginTop="20dp"
+                android:layout_height="wrap_content" />
+        </RelativeLayout>
+    </RelativeLayout>
+</layout>

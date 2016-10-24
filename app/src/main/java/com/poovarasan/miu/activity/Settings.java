@@ -43,8 +43,8 @@ public class Settings extends AppCompatActivity {
         ParseUser parseUser = ParseUser.getCurrentUser();
         String status = parseUser.getString("status");
 
-        if (status.length() > 30)
-            status = status.substring(0, 30) + "...";
+        if (status.length() > 25)
+            status = status.substring(0, 25) + "...";
 
 
         LinearLayoutManager llm = new LinearLayoutManager(this);
@@ -85,7 +85,7 @@ public class Settings extends AppCompatActivity {
 
         List<SettingMenuAdapter> settingMenuAdapters = new ArrayList<>();
         for (int i = 0; i < title.length; i++) {
-            settingMenuAdapters.add(new SettingMenuAdapter(icons[i], title[i]));
+            settingMenuAdapters.add(new SettingMenuAdapter(icons[i], title[i], this, DataUsage.class));
         }
 
         fastAdapter = new FastItemAdapter<>();
