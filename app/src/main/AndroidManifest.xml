@@ -81,7 +81,10 @@
         <activity
             android:name=".activity.Settings"
             android:label="Settings" />
-        <activity android:name=".activity.DataUsage"></activity>
+        <activity
+            android:name=".activity.DataUsage"
+            android:label="Data Usage" />
+        <activity android:name=".activity.MessageActivity"></activity>
     </application>
 
 </manifest>
