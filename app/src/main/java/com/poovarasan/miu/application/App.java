@@ -2,9 +2,11 @@ package com.poovarasan.miu.application;
 
 import android.app.Application;
 import android.content.Intent;
+import android.util.Log;
 
 import com.parse.Parse;
 import com.parse.ParseInstallation;
+import com.parse.ParseUser;
 import com.poovarasan.miu.service.RedisService;
 import com.poovarasan.miu.sync.SyncReceiver;
 
@@ -39,6 +41,25 @@ public class App extends Application {
 
         Intent intent1 = new Intent(this, SyncReceiver.class);
         startService(intent);
+    }
+
+    public static void setOnline() {
+        if (ParseUser.getCurrentUser() != null) {
+            ParseUser parseUser = ParseUser.getCurrentUser();
+            parseUser.put("available", true);
+
+            Log.i("Online","yes");
+            parseUser.saveEventually();
+        }
+    }
+
+    public static void setOffline() {
+        if (ParseUser.getCurrentUser() != null) {
+            ParseUser parseUser = ParseUser.getCurrentUser();
+            parseUser.put("available", false);
+            Log.i("Online","no");
+            parseUser.saveEventually();
+        }
     }
 
 

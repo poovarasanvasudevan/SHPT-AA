@@ -25,6 +25,13 @@ public class Home extends AppCompatActivity implements TabLayout.OnTabSelectedLi
     int currentTab;
 
     @Override
+    protected void onStart() {
+        super.onStart();
+
+        App.setOnline();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activityHomeBinding = DataBindingUtil.setContentView(this, R.layout.activity_home);
@@ -122,5 +129,21 @@ public class Home extends AppCompatActivity implements TabLayout.OnTabSelectedLi
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        App.setOffline();
+    }
 
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        App.setOnline();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        App.setOffline();
+    }
 }

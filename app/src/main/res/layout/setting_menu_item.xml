@@ -20,7 +20,10 @@
                 android:id="@+id/menu_icon"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:padding="10dp" />
+                android:foregroundTint="#555"
+                android:tint="#555"
+                android:layout_gravity="center_vertical"
+                android:padding="12dp" />
 
             <TextView
                 android:id="@+id/menu_text"

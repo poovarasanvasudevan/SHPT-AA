@@ -22,7 +22,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.amulyakhare.textdrawable.TextDrawable;
 import com.mikepenz.fastadapter.IItemAdapter;
 import com.mikepenz.fastadapter.adapters.FastItemAdapter;
 import com.parse.FindCallback;
@@ -113,10 +112,8 @@ public class Contacts extends Fragment {
                 for (ParseObject parseObject : objects) {
                     Log.i("Loaded123", parseObject.getString("NUMBER"));
 
-                    TextDrawable drawable2 = TextDrawable.builder()
-                            .buildRound(parseObject.getString("NAME").trim().substring(0, 1), generateRandomColor());
                     contactAdapters.add(new ContactAdapter(
-                            drawable2,
+                            getResources().getDrawable(R.drawable.default_image),
                             parseObject.getString("NAME"),
                             parseObject.getString("STATUS")
                     ));

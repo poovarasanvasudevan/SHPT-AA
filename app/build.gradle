@@ -42,13 +42,10 @@ dependencies {
     apt 'org.jokar:permissiondispatcher-processor:2.0.8'
     compile group: 'redis.clients', name: 'jedis', version: '2.9.0'
 
-
-
     compile('com.mikepenz:fastadapter:1.8.2@aar') {
         transitive = true
     }
     compile 'com.mikepenz:fastadapter-extensions:1.8.0@aar'
-    compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
     compile 'hani.momanii.supernova_emoji_library:supernova-emoji-library:0.0.2'
     testCompile 'junit:junit:4.12'
 }

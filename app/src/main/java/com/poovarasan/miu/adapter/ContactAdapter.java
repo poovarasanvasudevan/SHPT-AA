@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import com.mikepenz.fastadapter.items.AbstractItem;
 import com.poovarasan.miu.R;
+import com.poovarasan.miu.widget.CircleImageView;
 
 import java.util.List;
 
@@ -68,6 +69,7 @@ public class ContactAdapter extends AbstractItem<ContactAdapter, ContactAdapter.
 
 
         holder.contact_image.setImageDrawable(image);
+        //holder.isOnline.setVisibility(View.GONE);
 
         if (status.length() > 20)
             status = status.substring(0, 20) + "...";
@@ -82,14 +84,16 @@ public class ContactAdapter extends AbstractItem<ContactAdapter, ContactAdapter.
 
         TextView contact_name;
         EmojiconTextView contact_number;
-        ImageView contact_image;
+        CircleImageView contact_image;
+        ImageView isOnline;
 
         public ViewHolder(View itemView) {
             super(itemView);
 
             this.contact_name = (TextView) itemView.findViewById(R.id.contact_name);
             this.contact_number = (EmojiconTextView) itemView.findViewById(R.id.contact_number);
-            this.contact_image = (ImageView) itemView.findViewById(R.id.contact_image);
+            this.contact_image = (CircleImageView) itemView.findViewById(R.id.contact_image);
+            this.isOnline = (ImageView) itemView.findViewById(R.id.isOnline);
         }
     }
 }

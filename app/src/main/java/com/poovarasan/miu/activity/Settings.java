@@ -1,5 +1,6 @@
 package com.poovarasan.miu.activity;
 
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -8,6 +9,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.mikepenz.fastadapter.adapters.FastItemAdapter;
 import com.parse.ParseUser;
@@ -51,6 +53,14 @@ public class Settings extends AppCompatActivity {
 
         activitySettingsBinding.displayStatus.setText(status);
         activitySettingsBinding.displayName.setText("Poovarasan Vasudevan");
+
+        activitySettingsBinding.displayStatus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(Settings.this, Status.class);
+                startActivity(i);
+            }
+        });
 
         title = new String[]{
                 "Accounts",
