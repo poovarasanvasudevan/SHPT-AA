@@ -26,7 +26,6 @@ public class ChatHeads extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         fragmentChatHeadBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_chat_head, container, false);
-
         fragmentChatHeadBinding.chatHeadAllow.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
@@ -47,10 +46,7 @@ public class ChatHeads extends Fragment {
                 } else {
 
                 }
-
-
-                Toast
-                        .makeText(getContext(), "Checked aaa", Toast.LENGTH_SHORT)
+                Toast.makeText(getContext(), "Checked aaa", Toast.LENGTH_SHORT)
                         .show();
             }
         });
