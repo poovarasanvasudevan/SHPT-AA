@@ -48,7 +48,10 @@ public class ChatHeads extends Fragment {
 
                 }
 
-                Toast.makeText(getContext(), "Checked aaa", Toast.LENGTH_SHORT).show();
+
+                Toast
+                        .makeText(getContext(), "Checked aaa", Toast.LENGTH_SHORT)
+                        .show();
             }
         });
         return fragmentChatHeadBinding.getRoot();
