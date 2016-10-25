@@ -28,7 +28,7 @@ public class Home extends AppCompatActivity implements TabLayout.OnTabSelectedLi
 
     private static final int JOB_ID = 4090;
     private static final long POLL_FREQUENCY = 1000 * 60 * 60 * 1;
-   // private static final long POLL_FREQUENCY = 1000 * 6;
+    //private static final long POLL_FREQUENCY = 1000 * 6;
     ActivityHomeBinding activityHomeBinding;
     private JobScheduler mJobScheduler;
     int currentTab;

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
@@ -27,6 +28,8 @@ public class Settings extends AppCompatActivity {
 
     String[] title;
     Drawable[] icons;
+    Class[] classes;
+
     FastItemAdapter<SettingMenuAdapter> fastAdapter;
 
     @Override
@@ -42,6 +45,7 @@ public class Settings extends AppCompatActivity {
 
         ParseUser parseUser = ParseUser.getCurrentUser();
         String status = parseUser.getString("status");
+        String dName = parseUser.getString("dname");
 
         if (status.length() > 25)
             status = status.substring(0, 25) + "...";
@@ -52,13 +56,31 @@ public class Settings extends AppCompatActivity {
         activitySettingsBinding.settingMenuList.setLayoutManager(llm);
 
         activitySettingsBinding.displayStatus.setText(status);
-        activitySettingsBinding.displayName.setText("Poovarasan Vasudevan");
+        activitySettingsBinding.displayName.setText(dName);
 
         activitySettingsBinding.displayStatus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(Settings.this, Status.class);
-                startActivity(i);
+
+
+                //  ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(Settings.this, view, DetailActivity.EXTRA_IMAGE);
+                ActivityCompat.startActivity(Settings.this, new Intent(Settings.this, Status.class),
+                        null);
+
+                // Intent i = new Intent(Settings.this, Status.class);
+                //startActivity(i);
+            }
+        });
+
+        activitySettingsBinding.profileImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                ActivityCompat.startActivity(Settings.this, new Intent(Settings.this, Profile.class),
+                        null);
+
+                //  Intent i = new Intent(Settings.this, Profile.class);
+                // startActivity(i);
             }
         });
 
@@ -83,9 +105,18 @@ public class Settings extends AppCompatActivity {
                 getResources().getDrawable(R.drawable.ic_help)
         };
 
+        classes = new Class[]{
+                DataUsage.class,
+                DataUsage.class,
+                DataUsage.class,
+                DataUsage.class,
+                DataUsage.class,
+                DataUsage.class,
+                DataUsage.class
+        };
         List<SettingMenuAdapter> settingMenuAdapters = new ArrayList<>();
         for (int i = 0; i < title.length; i++) {
-            settingMenuAdapters.add(new SettingMenuAdapter(icons[i], title[i], this, DataUsage.class));
+            settingMenuAdapters.add(new SettingMenuAdapter(icons[i], title[i], this, classes[i]));
         }
 
         fastAdapter = new FastItemAdapter<>();
@@ -105,5 +136,19 @@ public class Settings extends AppCompatActivity {
             finish();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        ParseUser parseUser = ParseUser.getCurrentUser();
+        String status = parseUser.getString("status");
+        String dName = parseUser.getString("dname");
+
+        if (status.length() > 25)
+            status = status.substring(0, 25) + "...";
+
+        activitySettingsBinding.displayStatus.setText(status);
+        activitySettingsBinding.displayName.setText(dName);
     }
 }

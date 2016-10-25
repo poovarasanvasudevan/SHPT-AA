@@ -47,8 +47,6 @@ public class Login extends AppCompatActivity {
                             Intent intent = new Intent(Login.this, RedisService.class);
                             startService(intent);
 
-
-
                             Intent i = new Intent(Login.this, Home.class);
                             startActivity(i);
                             finish();

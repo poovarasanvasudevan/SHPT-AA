@@ -1,7 +1,10 @@
 package com.poovarasan.miu.application;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.Log;
 
 import com.parse.Parse;
@@ -35,6 +38,8 @@ public class App extends Application {
                 .getCurrentInstallation()
                 .saveInBackground();
 
+        //App is online
+
         Intent intent = new Intent(this, RedisService.class);
         startService(intent);
 
@@ -57,6 +62,16 @@ public class App extends Application {
             Log.i("Online","no");
             parseUser.saveEventually();
         }
+    }
+
+    public static boolean isOnline(Context context) {
+
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+            return true;
+        }
+        return false;
     }
 
 

@@ -2,10 +2,7 @@ package com.poovarasan.miu.service;
 
 import android.app.Notification;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -48,7 +45,7 @@ public class RedisService extends Service {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            if (isOnline(getApplicationContext()) && ParseUser.getCurrentUser() != null) {
+            if (App.isOnline(getApplicationContext()) && ParseUser.getCurrentUser() != null) {
                 App.getRedis().subscribe(new RedisListener(getApplicationContext()), ParseUser.getCurrentUser().getUsername());
 
                 ParseQuery<ParseUser> query = ParseUser.getQuery();
@@ -90,40 +87,34 @@ public class RedisService extends Service {
         protected Void doInBackground(Void... voids) {
 
             if (ParseUser.getCurrentUser() != null) {
-                Log.i("Hit", "Hit");
-                Simple simple = null;
-                List<String> messageQueue = App.getRedis().lrange(ParseUser.getCurrentUser().getUsername() + ".messagequeue", 0, -1);
-                for (String message : messageQueue) {
-                    App.getRedis().rpop(ParseUser.getCurrentUser().getUsername() + ".messagequeue");
 
-                    String fullMessage = "\n" + message;
+                if(App.isOnline(getApplicationContext())) {
+                    Log.i("Hit", "Hit");
+                    Simple simple = null;
+                    List<String> messageQueue = App.getRedis().lrange(ParseUser.getCurrentUser().getUsername() + ".messagequeue", 0, -1);
+                    for (String message : messageQueue) {
+                        App.getRedis().rpop(ParseUser.getCurrentUser().getUsername() + ".messagequeue");
 
-                    simple = PugNotification.with(getApplicationContext())
-                            .load()
-                            .title("New Notification")
-                            .message(fullMessage)
-                            .smallIcon(R.drawable.notification)
-                            .largeIcon(R.drawable.notification_big)
-                            .flags(Notification.DEFAULT_ALL)
-                            .vibrate(new long[]{1000L, 200L, 300L})
-                            .simple();
+                        String fullMessage = "\n" + message;
+
+                        simple = PugNotification.with(getApplicationContext())
+                                .load()
+                                .title("New Notification")
+                                .message(fullMessage)
+                                .smallIcon(R.drawable.notification)
+                                .largeIcon(R.drawable.notification_big)
+                                .flags(Notification.DEFAULT_ALL)
+                                .vibrate(new long[]{1000L, 200L, 300L})
+                                .simple();
+                    }
+                    if (simple != null)
+                        simple.build();
                 }
-                if (simple != null)
-                    simple.build();
             }
             return null;
         }
     }
 
-    public boolean isOnline(Context context) {
-
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
-        if (networkInfo != null && networkInfo.isConnected()) {
-            return true;
-        }
-        return false;
-    }
 
     @Nullable
     @Override

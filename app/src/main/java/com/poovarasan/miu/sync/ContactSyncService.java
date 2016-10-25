@@ -15,6 +15,7 @@ public class ContactSyncService extends JobService {
         sync.makeSync();
 
         // Toast.makeText(getApplicationContext(), "Sync", Toast.LENGTH_LONG).show();
+        jobFinished(params, false);
         return false;
     }
 
@@ -22,4 +23,6 @@ public class ContactSyncService extends JobService {
     public boolean onStopJob(JobParameters params) {
         return false;
     }
+
+
 }

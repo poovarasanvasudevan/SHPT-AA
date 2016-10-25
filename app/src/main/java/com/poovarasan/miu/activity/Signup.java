@@ -37,10 +37,10 @@ public class Signup extends AppCompatActivity {
                 user.signUpInBackground(new SignUpCallback() {
                     public void done(ParseException e) {
                         if (e == null) {
-                            Toast.makeText(getApplicationContext(), "Signup Succes Login Now", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getApplicationContext(), "Signup Succes", Toast.LENGTH_LONG).show();
 
                             // Hooray! Let them use the app now.
-                            Intent intent = new Intent(Signup.this, Login.class);
+                            Intent intent = new Intent(Signup.this, Home.class);
                             startActivity(intent);
                             finish();
                         } else {

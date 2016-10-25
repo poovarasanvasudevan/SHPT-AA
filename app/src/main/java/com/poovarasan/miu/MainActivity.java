@@ -9,6 +9,16 @@ import com.parse.ParseUser;
 import com.poovarasan.miu.activity.Home;
 import com.poovarasan.miu.activity.Login;
 
+/**
+ * @author poovarasanv
+ * @see android.app.Activity
+ * @see android.content.Context
+ *
+ * @since 1.0
+ *
+ * this Activity is the Starting point of the App that decides is the user logged in or not and sends to
+ * Corresponding Activity
+ */
 public class MainActivity extends AppCompatActivity {
 
     @Override

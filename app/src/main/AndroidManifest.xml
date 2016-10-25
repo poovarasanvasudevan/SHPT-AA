@@ -36,7 +36,6 @@
         <activity android:name=".activity.Home" />
 
         <service android:name="com.parse.PushService" />
-        <service android:name=".sync.SyncService" />
 
         <receiver
             android:name=".receiver.GCMReceiver"
@@ -69,8 +68,8 @@
 
         <service
             android:name=".sync.ContactSyncService"
-            android:permission="android.permission.BIND_JOB_SERVICE"
-            android:exported="true" />
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <!-- IMPORTANT: Change "YOUR_SENDER_ID" to your GCM Sender Id. -->
         <meta-data
@@ -87,7 +86,11 @@
         <activity
             android:name=".activity.DataUsage"
             android:label="Data Usage" />
-        <activity android:name=".activity.MessageActivity"></activity>
+        <activity android:name=".activity.MessageActivity" />
+        <activity
+            android:name=".activity.Profile"
+            android:label="Profile"
+            android:windowSoftInputMode="adjustPan"></activity>
     </application>
 
 </manifest>
