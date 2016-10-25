@@ -137,58 +137,32 @@
 
                             </LinearLayout>
 
+
                             <View
                                 android:layout_width="match_parent"
-                                android:background="#aaa"
-                                android:layout_height="0.6dp"/>
-                            <LinearLayout
+                                android:layout_height="0.6dp"
+                                android:background="#aaa" />
+
+
+                            <fragment
+                                android:id="@+id/sync_contact_fragment"
+                                android:name="com.poovarasan.miu.fragments.widget.SyncContact"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:paddingBottom="16dp"
-                                android:paddingLeft="16dp">
+                                tools:layout="@layout/fragment_sync_contact" />
 
-                                <TextView
-                                    style="@style/TextAppearance.AppCompat.Body2"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:layout_margin="8dp"
-                                    android:text="Sync Contacts Every :"
-                                    android:textSize="18dp" />
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="0.6dp"
+                                android:background="#aaa" />
 
 
-                                <RadioGroup
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginLeft="20dp">
-
-                                    <android.support.v7.widget.AppCompatRadioButton
-                                        android:id="@+id/oneHour"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:checked="false"
-                                        android:text="1 Hour"
-                                        android:textSize="18dp" />
-
-                                    <android.support.v7.widget.AppCompatRadioButton
-                                        android:id="@+id/threeHour"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:checked="false"
-                                        android:text="3 Hour"
-                                        android:textSize="18dp" />
-
-
-                                    <android.support.v7.widget.AppCompatRadioButton
-                                        android:id="@+id/sixHour"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:checked="false"
-                                        android:text="6 Hour"
-                                        android:textSize="18dp" />
-
-                                </RadioGroup>
-                            </LinearLayout>
+                            <fragment
+                                android:id="@+id/chat_head_fragment"
+                                android:name="com.poovarasan.miu.fragments.widget.ChatHeads"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                tools:layout="@layout/fragment_chat_head" />
 
                         </LinearLayout>
                     </android.support.v7.widget.CardView>
