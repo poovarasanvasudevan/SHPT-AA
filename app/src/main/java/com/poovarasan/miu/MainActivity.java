@@ -33,5 +33,16 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }, 2000);
+
+        /**
+         *
+         * @author Poovarasan Vasudevan
+         * @reason This is Meant Splash Screen Moving One Screen to Other if Logged in
+         *          then it goes to Home Screen else goes to Login Screen
+         * @see http://miu.com/docs/login
+         *
+         * ***/
+
+
     }
 }
