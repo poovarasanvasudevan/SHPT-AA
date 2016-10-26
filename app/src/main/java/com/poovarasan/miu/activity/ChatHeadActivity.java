@@ -12,16 +12,15 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Display;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
+import android.widget.Toast;
 
 import com.flipkart.chatheads.ui.ChatHead;
 import com.flipkart.chatheads.ui.ChatHeadArrangement;
 import com.flipkart.chatheads.ui.ChatHeadContainer;
 import com.flipkart.chatheads.ui.ChatHeadListener;
 import com.flipkart.chatheads.ui.ChatHeadViewAdapter;
-import com.flipkart.chatheads.ui.CircularArrangement;
 import com.flipkart.chatheads.ui.MinimizedArrangement;
 import com.poovarasan.miu.MainActivity;
 import com.poovarasan.miu.R;
@@ -104,11 +103,12 @@ public class ChatHeadActivity extends AppCompatActivity {
             @Override
             public void onChatHeadRollOver(Object key, final ChatHead chatHead) {
 
+                Toast.makeText(getApplicationContext(),"Roll Over",Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onChatHeadRollOut(Object key, ChatHead chatHead) {
-
+                Toast.makeText(getApplicationContext(),"Roll Out",Toast.LENGTH_SHORT).show();
             }
         });
         activityChatHeadBinding.chatHeadContainer.setListener(new ChatHeadListener() {
@@ -140,30 +140,7 @@ public class ChatHeadActivity extends AppCompatActivity {
             activityChatHeadBinding.chatHeadContainer.setArrangement(MinimizedArrangement.class, null);
 
         }
-        activityChatHeadBinding.activityChatHead.setOnTouchListener(new View.OnTouchListener() {
 
-            Bundle bundle = new Bundle();
-            Runnable longPressCallback = new Runnable() {
-                @Override
-                public void run() {
-                    activityChatHeadBinding.chatHeadContainer.setArrangement(CircularArrangement.class, bundle);
-                }
-            };
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                activityChatHeadBinding.chatHeadContainer.dispatchTouchEvent(event);
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    activityChatHeadBinding.activityChatHead.removeCallbacks(longPressCallback);
-                    bundle.putInt(CircularArrangement.BUNDLE_KEY_X, (int) event.getX());
-                    bundle.putInt(CircularArrangement.BUNDLE_KEY_Y, (int) event.getY());
-                    activityChatHeadBinding.activityChatHead.postDelayed(longPressCallback, 1000);
-                } else if (event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL) {
-                    activityChatHeadBinding.activityChatHead.removeCallbacks(longPressCallback);
-                }
-                return true;
-            }
-        });
         activityChatHeadBinding.chatHeadContainer.setConfig(new CharHeadConfig(this, getInitialX(), getInitialY()));
         activityChatHeadBinding.chatHeadContainer.addChatHead("head" + Math.random(), false, true);
         activityChatHeadBinding.chatHeadContainer.setArrangement(MinimizedArrangement.class, null);
