@@ -54,5 +54,16 @@ public class MainActivity extends AppCompatActivity {
          * ***/
 
 
+
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (getIntent().getExtras() != null && getIntent().getBooleanExtra("EXTRA_FINISH", false)) {
+            finish();
+        }
     }
 }

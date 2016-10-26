@@ -3,7 +3,6 @@ package com.poovarasan.miu.fragments;
 import android.Manifest;
 import android.app.SearchManager;
 import android.databinding.DataBindingUtil;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -41,7 +40,6 @@ import org.jokar.permissiondispatcher.annotation.RuntimePermissions;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import static android.content.Context.SEARCH_SERVICE;
 
@@ -125,20 +123,6 @@ public class Contacts extends Fragment {
 
     }
 
-    public int generateRandomColor() {
-        Random random = new Random();
-        int red = random.nextInt(256);
-        int green = random.nextInt(256);
-        int blue = random.nextInt(256);
-
-
-        red = (red + 255) / 2;
-        green = (green + 255) / 2;
-        blue = (blue + 255) / 2;
-
-        return Color.rgb(red, green, blue);
-
-    }
 
 
     @Override

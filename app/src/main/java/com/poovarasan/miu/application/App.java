@@ -3,6 +3,7 @@ package com.poovarasan.miu.application;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
@@ -11,6 +12,8 @@ import com.parse.Parse;
 import com.parse.ParseInstallation;
 import com.parse.ParseUser;
 import com.poovarasan.miu.service.RedisService;
+
+import java.util.Random;
 
 import redis.clients.jedis.Jedis;
 
@@ -73,6 +76,22 @@ public class App extends Application {
         }
         return false;
     }
+
+    public static int generateRandomColor() {
+        Random random = new Random();
+        int red = random.nextInt(256);
+        int green = random.nextInt(256);
+        int blue = random.nextInt(256);
+
+
+        red = (red + 255) / 2;
+        green = (green + 255) / 2;
+        blue = (blue + 255) / 2;
+
+        return Color.rgb(red, green, blue);
+
+    }
+
 
 
     public static Jedis getRedis() {

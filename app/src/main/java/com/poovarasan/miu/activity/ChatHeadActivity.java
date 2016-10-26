@@ -1,5 +1,6 @@
 package com.poovarasan.miu.activity;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
@@ -14,7 +15,6 @@ import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
 
 import com.flipkart.chatheads.ui.ChatHead;
 import com.flipkart.chatheads.ui.ChatHeadArrangement;
@@ -23,7 +23,9 @@ import com.flipkart.chatheads.ui.ChatHeadListener;
 import com.flipkart.chatheads.ui.ChatHeadViewAdapter;
 import com.flipkart.chatheads.ui.CircularArrangement;
 import com.flipkart.chatheads.ui.MinimizedArrangement;
+import com.poovarasan.miu.MainActivity;
 import com.poovarasan.miu.R;
+import com.poovarasan.miu.application.App;
 import com.poovarasan.miu.config.CharHeadConfig;
 import com.poovarasan.miu.databinding.ActivityChatHeadBinding;
 import com.poovarasan.miu.fragments.widget.CharHeadContainer;
@@ -43,13 +45,13 @@ public class ChatHeadActivity extends AppCompatActivity {
         chatHeadPreferences = getSharedPreferences("chat", MODE_PRIVATE);
 
         Window window = this.getWindow();
-        window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-        window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
-        window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
-
+        //window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+        //window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+        //window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setStatusBarColor(Color.TRANSPARENT);
+            getWindow().setNavigationBarColor(Color.TRANSPARENT);
         }
         activityChatHeadBinding.chatHeadContainer.setViewAdapter(new ChatHeadViewAdapter() {
             @Override
@@ -70,13 +72,12 @@ public class ChatHeadActivity extends AppCompatActivity {
 
 
                 CircularDrawable circularDrawable = new CircularDrawable();
-                TextDrawer textDrawer = new TextDrawer().setText("A").setText("#fff");
+                TextDrawer textDrawer = new TextDrawer().setText("A").setTextColor(Color.WHITE).setBackgroundColor(App.generateRandomColor());
                 circularDrawable.setBitmapOrTextOrIcon(textDrawer);
 
 
-                circularDrawable.setNotificationDrawer(new CircularNotificationDrawer().setNotificationText("51").setNotificationAngle(135).setNotificationColor(Color.WHITE, Color.RED));
-                circularDrawable.setDivider(4, Color.WHITE);
-                circularDrawable.setBorder(Color.BLACK, 4);
+                circularDrawable
+                        .setNotificationDrawer(new CircularNotificationDrawer().setNotificationText("1").setNotificationAngle(135).setNotificationColor(Color.WHITE, Color.RED));
 
                 // this is where you return a drawable for the chat head itself based on the key. Typically you return a circular shape
                 // you may want to checkout circular image library https://github.com/flipkart-incubator/circular-image
@@ -117,7 +118,7 @@ public class ChatHeadActivity extends AppCompatActivity {
 
             @Override
             public void onChatHeadRemoved(Object key, boolean userTriggered) {
-                finish();
+                quit();
             }
 
             @Override
@@ -176,6 +177,20 @@ public class ChatHeadActivity extends AppCompatActivity {
         int height = size.y;
         float defaultChatHeadXPosition = width;
         return chatHeadPreferences.getInt("initialX", (int) defaultChatHeadXPosition);
+    }
+
+    public void quit() {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            finishAndRemoveTask();
+        } else {
+
+            Intent intent  = new Intent(this, MainActivity.class);
+            intent.putExtra("EXTRA_FINISH", true);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            finish();
+        }
     }
 
     private int getInitialY() {

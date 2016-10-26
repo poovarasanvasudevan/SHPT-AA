@@ -34,7 +34,7 @@ public class RedisListener extends JedisPubSub {
         Log.i(channel, message);
         notifyMe(message, context);
 
-        startActivity();
+        startChatHead();
     }
 
     @Override
@@ -163,7 +163,7 @@ public class RedisListener extends JedisPubSub {
         }
     }
 
-    public void startActivity() {
+    public void startChatHead() {
         Intent dialogIntent = new Intent(context, ChatHeadActivity.class);
         dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(dialogIntent);
