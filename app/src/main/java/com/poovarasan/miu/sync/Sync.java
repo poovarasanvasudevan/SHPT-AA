@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
-import android.util.Log;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -46,7 +45,6 @@ public class Sync {
                         while (pCur.moveToNext()) {
                             String contactNumber = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
                             alContacts.add(contactNumber.replaceAll("[\\s()-]", "").trim());
-                            Log.i("Contacts", contactNumber.replaceAll("[\\s()-]", "").trim());
                             break;
                         }
                         pCur.close();
@@ -71,12 +69,8 @@ public class Sync {
                         }
                     });
 
-
-                    Log.i("Sync Taked Place", "Sync");
                     if(objects !=null && objects.size() > 0) {
                         for (ParseUser parseUser : objects) {
-
-                            Log.i("Sync Taked Place", parseUser.getUsername());
                             ParseObject users = new ParseObject("MyUsers");
                             users.put("NUMBER", parseUser.getUsername());
                             users.put("STATUS", parseUser.get("status"));

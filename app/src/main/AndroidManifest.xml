@@ -90,7 +90,8 @@
         <activity
             android:name=".activity.Profile"
             android:label="Profile"
-            android:windowSoftInputMode="adjustPan"></activity>
+            android:windowSoftInputMode="adjustPan" />
+        <activity android:name=".activity.ChatHeadActivity" android:theme="@style/Theme.AppCompat.Translucent"></activity>
     </application>
 
 </manifest>

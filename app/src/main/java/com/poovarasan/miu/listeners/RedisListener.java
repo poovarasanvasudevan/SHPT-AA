@@ -2,12 +2,14 @@ package com.poovarasan.miu.listeners;
 
 import android.app.Notification;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v4.os.AsyncTaskCompat;
 import android.util.Log;
 
 import com.parse.ParseUser;
 import com.poovarasan.miu.R;
+import com.poovarasan.miu.activity.ChatHeadActivity;
 import com.poovarasan.miu.application.App;
 
 import java.util.List;
@@ -31,6 +33,8 @@ public class RedisListener extends JedisPubSub {
     public void onMessage(String channel, String message) {
         Log.i(channel, message);
         notifyMe(message, context);
+
+        startActivity();
     }
 
     @Override
@@ -157,5 +161,12 @@ public class RedisListener extends JedisPubSub {
             }
             return null;
         }
+    }
+
+    public void startActivity() {
+        Intent dialogIntent = new Intent(context, ChatHeadActivity.class);
+        dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(dialogIntent);
+
     }
 }
