@@ -1,6 +1,5 @@
 package com.poovarasan.miu.activity;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
@@ -8,6 +7,7 @@ import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -22,7 +22,6 @@ import com.flipkart.chatheads.ui.ChatHeadContainer;
 import com.flipkart.chatheads.ui.ChatHeadListener;
 import com.flipkart.chatheads.ui.ChatHeadViewAdapter;
 import com.flipkart.chatheads.ui.MinimizedArrangement;
-import com.poovarasan.miu.MainActivity;
 import com.poovarasan.miu.R;
 import com.poovarasan.miu.application.App;
 import com.poovarasan.miu.config.CharHeadConfig;
@@ -36,6 +35,7 @@ public class ChatHeadActivity extends AppCompatActivity {
 
     ActivityChatHeadBinding activityChatHeadBinding;
     private SharedPreferences chatHeadPreferences;
+    public static boolean isChatOpen = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,21 +103,23 @@ public class ChatHeadActivity extends AppCompatActivity {
             @Override
             public void onChatHeadRollOver(Object key, final ChatHead chatHead) {
 
-                Toast.makeText(getApplicationContext(),"Roll Over",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Roll Over", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onChatHeadRollOut(Object key, ChatHead chatHead) {
-                Toast.makeText(getApplicationContext(),"Roll Out",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Roll Out", Toast.LENGTH_SHORT).show();
             }
         });
         activityChatHeadBinding.chatHeadContainer.setListener(new ChatHeadListener() {
             @Override
             public void onChatHeadAdded(Object key) {
+                isChatOpen = true;
             }
 
             @Override
             public void onChatHeadRemoved(Object key, boolean userTriggered) {
+                isChatOpen = false;
                 quit();
             }
 
@@ -142,8 +144,12 @@ public class ChatHeadActivity extends AppCompatActivity {
         }
 
         activityChatHeadBinding.chatHeadContainer.setConfig(new CharHeadConfig(this, getInitialX(), getInitialY()));
-        activityChatHeadBinding.chatHeadContainer.addChatHead("head" + Math.random(), false, true);
+        addChat();
         activityChatHeadBinding.chatHeadContainer.setArrangement(MinimizedArrangement.class, null);
+    }
+
+    public void addChat() {
+        activityChatHeadBinding.chatHeadContainer.addChatHead("head" + Math.random(), false, true);
     }
 
     private int getInitialX() {
@@ -161,12 +167,7 @@ public class ChatHeadActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             finishAndRemoveTask();
         } else {
-
-            Intent intent  = new Intent(this, MainActivity.class);
-            intent.putExtra("EXTRA_FINISH", true);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
+            ActivityCompat.finishAffinity(this);
         }
     }
 

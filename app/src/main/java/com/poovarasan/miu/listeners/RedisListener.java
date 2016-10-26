@@ -164,9 +164,14 @@ public class RedisListener extends JedisPubSub {
     }
 
     public void startChatHead() {
-        Intent dialogIntent = new Intent(context, ChatHeadActivity.class);
-        dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(dialogIntent);
 
+        if (ChatHeadActivity.isChatOpen) {
+            ChatHeadActivity c = new ChatHeadActivity();
+            c.addChat();
+        } else {
+            Intent dialogIntent = new Intent(context, ChatHeadActivity.class);
+            dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(dialogIntent);
+        }
     }
 }
