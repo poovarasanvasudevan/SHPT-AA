@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Display;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.flipkart.chatheads.ui.ChatHead;
@@ -44,9 +45,9 @@ public class ChatHeadActivity extends AppCompatActivity {
         chatHeadPreferences = getSharedPreferences("chat", MODE_PRIVATE);
 
         Window window = this.getWindow();
-        //window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-        //window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
-        //window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+        window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+        window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+        window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setStatusBarColor(Color.TRANSPARENT);
