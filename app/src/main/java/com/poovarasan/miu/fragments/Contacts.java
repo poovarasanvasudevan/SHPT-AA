@@ -2,10 +2,12 @@ package com.poovarasan.miu.fragments;
 
 import android.Manifest;
 import android.app.SearchManager;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.os.AsyncTaskCompat;
 import android.support.v4.view.MenuItemCompat;
@@ -21,6 +23,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.mikepenz.fastadapter.FastAdapter;
+import com.mikepenz.fastadapter.IAdapter;
 import com.mikepenz.fastadapter.IItemAdapter;
 import com.mikepenz.fastadapter.adapters.FastItemAdapter;
 import com.parse.FindCallback;
@@ -28,6 +32,7 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.poovarasan.miu.R;
+import com.poovarasan.miu.activity.MessageActivity;
 import com.poovarasan.miu.adapter.ContactAdapter;
 import com.poovarasan.miu.databinding.FragmentContactsBinding;
 import com.poovarasan.miu.sync.Sync;
@@ -84,6 +89,12 @@ public class Contacts extends Fragment {
 
         load();
 
+        fragmentContactsBinding.contactRefresh.setColorSchemeResources(
+                R.color.md_red_500,
+                R.color.md_green_500,
+                R.color.md_yellow_500,
+                R.color.md_teal_500
+        );
 
         fragmentContactsBinding.contactRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -91,6 +102,8 @@ public class Contacts extends Fragment {
                 AsyncTaskCompat.executeParallel(new RefreshUser(), null);
             }
         });
+
+
         return fragmentContactsBinding.getRoot();
     }
 
@@ -118,11 +131,17 @@ public class Contacts extends Fragment {
                 }
                 fastAdapter.add(contactAdapters);
                 fastAdapter.notifyAdapterDataSetChanged();
+                fastAdapter.withOnClickListener(new FastAdapter.OnClickListener<ContactAdapter>() {
+                    @Override
+                    public boolean onClick(View v, IAdapter<ContactAdapter> adapter, ContactAdapter item, int position) {
+                        ActivityCompat.startActivity(getActivity(), new Intent(getActivity(), MessageActivity.class), null);
+                        return false;
+                    }
+                });
             }
         });
 
     }
-
 
 
     @Override

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <RelativeLayout xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/activity_message"
@@ -7,14 +8,107 @@
         android:layout_height="match_parent"
         tools:context="com.poovarasan.miu.activity.MessageActivity">
 
-        <include
-            android:id="@+id/toolbarinclude"
-            layout="@layout/toolbar" />
+
+        <LinearLayout
+            android:id="@+id/appbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:orientation="vertical">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?actionBarSize"
+                android:background="?colorPrimary"
+                android:contentInsetEnd="0dp"
+                android:contentInsetLeft="0dp"
+                android:contentInsetRight="0dp"
+                android:contentInsetStart="0dp"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                app:contentInsetEnd="0dp"
+                app:contentInsetLeft="0dp"
+                app:contentInsetRight="0dp"
+                app:contentInsetStart="0dp"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageButton
+                        android:id="@+id/toolBarBackBtn"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@android:color/transparent"
+                        android:src="@drawable/ic_arrow_back" />
+
+                    <com.balysv.materialripple.MaterialRippleLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:mrl_rippleColor="?colorPrimaryDark"
+                        app:mrl_rippleOverlay="true">
+
+                        <LinearLayout
+                            android:id="@+id/profileButton"
+                            android:layout_width="wrap_content"
+                            android:padding="2dp"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical">
+
+                            <com.poovarasan.miu.widget.CircleImageView
+                                android:id="@+id/toolbarProfileImage"
+                                android:layout_width="40dp"
+                                android:src="@drawable/default_image"
+                                android:layout_height="40dp" />
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="50dp"
+                                android:layout_marginLeft="10dp"
+                                android:padding="3dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/toolBarTitle"
+                                    style="@style/TextAppearance.AppCompat.Title"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="match_parent"
+                                    android:textSize="18dp"
+                                    android:layout_weight="1"
+                                    android:ellipsize="end"
+                                    android:singleLine="true"
+                                    android:text="Poovarasan Vasudevan" />
+
+                                <TextView
+                                    android:id="@+id/toolBarSubtitle"
+                                    style="@style/TextAppearance.AppCompat.Subhead"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="match_parent"
+                                    android:layout_weight="1"
+                                    android:textSize="16dp"
+                                    android:ellipsize="end"
+                                    android:singleLine="true"
+                                    android:text="Online" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </com.balysv.materialripple.MaterialRippleLayout>
+                </LinearLayout>
+            </android.support.v7.widget.Toolbar>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                android:background="@drawable/toolbarshadow" />
+        </LinearLayout>
+
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/toolbarinclude">
+            android:layout_below="@+id/appbar">
 
         </RelativeLayout>
     </RelativeLayout>
