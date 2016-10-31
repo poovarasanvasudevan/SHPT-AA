@@ -1,20 +1,31 @@
 package com.poovarasan.miu.listeners;
 
 import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.PixelFormat;
 import android.os.AsyncTask;
+import android.os.PowerManager;
 import android.support.v4.os.AsyncTaskCompat;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 
 import com.parse.ParseUser;
 import com.poovarasan.miu.R;
+import com.poovarasan.miu.activity.MessageActivity;
 import com.poovarasan.miu.application.App;
 
 import java.util.List;
 
 import br.com.goncalves.pugnotification.notification.PugNotification;
+import br.com.goncalves.pugnotification.notification.Simple;
 import redis.clients.jedis.Client;
 import redis.clients.jedis.JedisPubSub;
+
+import static android.content.Context.WINDOW_SERVICE;
 
 /**
  * Created by poovarasanv on 18/10/16.
@@ -22,6 +33,9 @@ import redis.clients.jedis.JedisPubSub;
 
 public class RedisListener extends JedisPubSub {
     Context context;
+    WindowManager mWindowManager;
+    View mView;
+
 
     public RedisListener(Context context) {
         this.context = context;
@@ -31,6 +45,7 @@ public class RedisListener extends JedisPubSub {
     public void onMessage(String channel, String message) {
         Log.i(channel, message);
         notifyMe(message, context);
+        // showDialog(message);
     }
 
     @Override
@@ -121,6 +136,8 @@ public class RedisListener extends JedisPubSub {
     }
 
     public void notifyMe(String message, Context context) {
+        Intent intent = new Intent(context, MessageActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         PugNotification.with(context)
                 .load()
                 .title("New Notification")
@@ -129,6 +146,7 @@ public class RedisListener extends JedisPubSub {
                 .largeIcon(R.drawable.notification_big)
                 .flags(Notification.DEFAULT_ALL)
                 .vibrate(new long[]{1000L, 200L, 300L})
+                .button(R.drawable.ic_reply, "reply", pendingIntent)
                 .simple()
                 .build();
     }
@@ -139,12 +157,15 @@ public class RedisListener extends JedisPubSub {
 
             Log.i("Hit", "Hit");
             List<String> messageQueue = App.getRedis().lrange(ParseUser.getCurrentUser().getUsername() + ".messagequeue", 0, -1);
+            Simple simple = null;
+            boolean isMessageAvailable = false;
             for (String message : messageQueue) {
                 App.getRedis().rpop(ParseUser.getCurrentUser().getUsername() + ".messagequeue");
 
+                isMessageAvailable = true;
                 String fullMessage = "\n" + message;
 
-                PugNotification.with(context)
+                simple = PugNotification.with(context)
                         .load()
                         .title("New Notification")
                         .message(fullMessage)
@@ -152,10 +173,50 @@ public class RedisListener extends JedisPubSub {
                         .largeIcon(R.drawable.notification_big)
                         .flags(Notification.DEFAULT_ALL)
                         .vibrate(new long[]{1000L, 200L, 300L})
-                        .simple()
-                        .build();
+                        .simple();
+
             }
+
+            if (isMessageAvailable)
+                simple.build();
             return null;
+        }
+    }
+
+
+    private void showDialog(String aTitle) {
+        PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+        PowerManager.WakeLock mWakeLock = pm.newWakeLock((PowerManager.SCREEN_DIM_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP), "YourServie");
+        mWakeLock.acquire();
+        mWakeLock.release();
+
+        mWindowManager = (WindowManager) context.getSystemService(WINDOW_SERVICE);
+        mView = View.inflate(context, R.layout.activity_message, null);
+        mView.setTag("MY");
+
+        int top = context.getResources().getDisplayMetrics().heightPixels / 2;
+
+
+        final WindowManager.LayoutParams mLayoutParams = new WindowManager.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT, 0, 0,
+                WindowManager.LayoutParams.TYPE_SYSTEM_ERROR,
+                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                        | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
+                        | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                        | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
+                PixelFormat.RGBA_8888);
+
+        mView.setVisibility(View.VISIBLE);
+        mWindowManager.addView(mView, mLayoutParams);
+        mWindowManager.updateViewLayout(mView, mLayoutParams);
+
+    }
+
+    private void hideDialog() {
+        if (mView != null && mWindowManager != null) {
+            mWindowManager.removeView(mView);
+            mView = null;
         }
     }
 }
