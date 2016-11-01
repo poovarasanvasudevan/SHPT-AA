@@ -3,12 +3,14 @@ package com.poovarasan.miu.fragments;
 import android.Manifest;
 import android.app.SearchManager;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.os.AsyncTaskCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -21,7 +23,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.mikepenz.fastadapter.FastAdapter;
 import com.mikepenz.fastadapter.IAdapter;
@@ -36,15 +37,12 @@ import com.poovarasan.miu.activity.MessageActivity;
 import com.poovarasan.miu.adapter.ContactAdapter;
 import com.poovarasan.miu.databinding.FragmentContactsBinding;
 import com.poovarasan.miu.sync.Sync;
-import com.poovarasan.miu.util.PermissionUtil;
-
-import org.jokar.permissiondispatcher.annotation.NeedsPermission;
-import org.jokar.permissiondispatcher.annotation.OnNeverAskAgain;
-import org.jokar.permissiondispatcher.annotation.OnPermissionDenied;
-import org.jokar.permissiondispatcher.annotation.RuntimePermissions;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import pl.tajchert.nammu.Nammu;
+import pl.tajchert.nammu.PermissionCallback;
 
 import static android.content.Context.SEARCH_SERVICE;
 
@@ -52,7 +50,7 @@ import static android.content.Context.SEARCH_SERVICE;
  * Created by poovarasanv on 14/10/16.
  */
 
-@RuntimePermissions
+
 public class Contacts extends Fragment {
     FragmentContactsBinding fragmentContactsBinding;
     int permisssionDeniedType = 0;
@@ -68,32 +66,55 @@ public class Contacts extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         fragmentContactsBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_contacts, container, false);
-        ContactsPermissionsDispatcher.showContactsWithCheck(this);
-
-        fragmentContactsBinding.givePermission.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.i("Permission Types", permisssionDeniedType + "-->");
-                Toast.makeText(getContext(), "Permission Needed to Continue", Toast.LENGTH_SHORT).show();
-                ContactsPermissionsDispatcher.showContactsWithCheck(Contacts.this);
-
-                PermissionUtil.startInstalledAppDetailsActivity(getActivity());
-
-            }
-        });
 
 
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         fragmentContactsBinding.allcontacts.setLayoutManager(llm);
 
-        load();
+        int permissionCheck = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_CONTACTS);
+        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
 
+            load();
+        } else {
+            Nammu.askForPermission(getActivity(), new String[]{Manifest.permission.READ_CONTACTS}, new PermissionCallback() {
+                @Override
+                public void permissionGranted() {
+
+                    new RefreshUser().execute();
+                }
+
+                @Override
+                public void permissionRefused() {
+                    fragmentContactsBinding.contactPermission.setVisibility(View.VISIBLE);
+                }
+            });
+        }
+
+        fragmentContactsBinding.givePermission.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Nammu.askForPermission(getActivity(), new String[]{Manifest.permission.READ_CONTACTS}, new PermissionCallback() {
+                    @Override
+                    public void permissionGranted() {
+
+                        new RefreshUser().execute();
+                    }
+
+                    @Override
+                    public void permissionRefused() {
+                        fragmentContactsBinding.contactPermission.setVisibility(View.VISIBLE);
+                    }
+                });
+            }
+        });
         fragmentContactsBinding.contactRefresh.setColorSchemeResources(
                 R.color.md_red_500,
                 R.color.md_green_500,
                 R.color.md_yellow_500,
-                R.color.md_teal_500
+                R.color.md_teal_500,
+                R.color.md_orange_500,
+                R.color.md_pink_500
         );
 
         fragmentContactsBinding.contactRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -124,9 +145,10 @@ public class Contacts extends Fragment {
                     Log.i("Loaded123", parseObject.getString("NUMBER"));
 
                     contactAdapters.add(new ContactAdapter(
-                            getResources().getDrawable(R.drawable.default_image),
+                            parseObject.getBytes("IMAGE"),
                             parseObject.getString("NAME"),
-                            parseObject.getString("STATUS")
+                            parseObject.getString("STATUS"),
+                            getActivity().getApplicationContext()
                     ));
                 }
                 fastAdapter.add(contactAdapters);
@@ -210,22 +232,11 @@ public class Contacts extends Fragment {
         }
     }
 
-    @NeedsPermission(Manifest.permission.READ_CONTACTS)
-    public void showContacts() {
-        fragmentContactsBinding.contactPermission.setVisibility(View.GONE);
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        Nammu.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    @OnPermissionDenied(Manifest.permission.READ_CONTACTS)
-    public void contactPermissionDenied() {
-        Toast.makeText(getContext(), "Permission Denied", Toast.LENGTH_SHORT).show();
-        fragmentContactsBinding.contactPermission.setVisibility(View.VISIBLE);
-        permisssionDeniedType = 1;
-    }
-
-    @OnNeverAskAgain(Manifest.permission.READ_CONTACTS)
-    public void contactPermissionNeverAsked() {
-        //PermissionUtil.openAppSettings((Activity) getActivity());
-        fragmentContactsBinding.contactPermission.setVisibility(View.VISIBLE);
-        permisssionDeniedType = 2;
-    }
 }

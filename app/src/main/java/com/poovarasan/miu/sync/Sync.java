@@ -69,11 +69,12 @@ public class Sync {
                         }
                     });
 
-                    if(objects !=null && objects.size() > 0) {
+                    if (objects != null && objects.size() > 0) {
                         for (ParseUser parseUser : objects) {
                             ParseObject users = new ParseObject("MyUsers");
                             users.put("NUMBER", parseUser.getUsername());
                             users.put("STATUS", parseUser.get("status"));
+                            users.put("IMAGE", parseUser.get("image") == null ? App.getDefaultImage(context) : parseUser.get("image"));
                             users.put("NAME", getContactName(context, parseUser.getUsername()));
                             users.pinInBackground();
                         }

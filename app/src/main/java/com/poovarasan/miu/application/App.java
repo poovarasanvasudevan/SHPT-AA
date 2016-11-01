@@ -3,6 +3,9 @@ package com.poovarasan.miu.application;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -11,8 +14,10 @@ import android.util.Log;
 import com.parse.Parse;
 import com.parse.ParseInstallation;
 import com.parse.ParseUser;
+import com.poovarasan.miu.R;
 import com.poovarasan.miu.service.RedisService;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Random;
 
 import redis.clients.jedis.Jedis;
@@ -24,6 +29,7 @@ import redis.clients.jedis.Jedis;
 public class App extends Application {
 
     static Jedis jedis;
+    static Resources resources;
 
     @Override
     public void onCreate() {
@@ -41,6 +47,12 @@ public class App extends Application {
                 .getCurrentInstallation()
                 .saveInBackground();
 
+        resources = getResources();
+//        EasyImage.configuration(this)
+//                .setImagesFolderName("MiuImages")
+//                .saveInAppExternalFilesDir()
+//                .setCopyExistingPicturesToPublicLocation(true);
+
         //App is online
 
         Intent intent = new Intent(this, RedisService.class);
@@ -53,7 +65,7 @@ public class App extends Application {
             ParseUser parseUser = ParseUser.getCurrentUser();
             parseUser.put("available", true);
 
-            Log.i("Online","yes");
+            Log.i("Online", "yes");
             parseUser.saveEventually();
         }
     }
@@ -62,7 +74,7 @@ public class App extends Application {
         if (ParseUser.getCurrentUser() != null) {
             ParseUser parseUser = ParseUser.getCurrentUser();
             parseUser.put("available", false);
-            Log.i("Online","no");
+            Log.i("Online", "no");
             parseUser.saveEventually();
         }
     }
@@ -92,6 +104,16 @@ public class App extends Application {
 
     }
 
+
+    public static byte[] getDefaultImage(Context context) {
+
+        Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.default_image);
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        byte[] bitmapdata = stream.toByteArray();
+
+        return bitmapdata;
+    }
 
 
     public static Jedis getRedis() {

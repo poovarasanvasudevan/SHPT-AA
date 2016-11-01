@@ -1,11 +1,12 @@
 package com.poovarasan.miu.adapter;
 
-import android.graphics.drawable.Drawable;
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.mikepenz.fastadapter.items.AbstractItem;
 import com.poovarasan.miu.R;
 import com.poovarasan.miu.widget.CircleImageView;
@@ -20,20 +21,30 @@ import hani.momanii.supernova_emoji_library.Helper.EmojiconTextView;
 
 public class ContactAdapter extends AbstractItem<ContactAdapter, ContactAdapter.ViewHolder> {
 
-    Drawable image;
+    byte[] image;
     String name, status;
+    Context context;
 
-    public ContactAdapter(Drawable image, String name, String status) {
+    public ContactAdapter(byte[] image, String name, String status,Context context) {
         this.image = image;
         this.name = name;
         this.status = status;
+        this.context = context;
     }
 
-    public Drawable getImage() {
+    public Context getContext() {
+        return context;
+    }
+
+    public void setContext(Context context) {
+        this.context = context;
+    }
+
+    public byte[] getImage() {
         return image;
     }
 
-    public void setImage(Drawable image) {
+    public void setImage(byte[] image) {
         this.image = image;
     }
 
@@ -68,7 +79,11 @@ public class ContactAdapter extends AbstractItem<ContactAdapter, ContactAdapter.
         super.bindView(holder, payloads);
 
 
-        holder.contact_image.setImageDrawable(image);
+        Glide.with(context)
+                .load(image)
+                .into(holder.contact_image);
+
+       // holder.contact_image.setImageDrawable(image);
         //holder.isOnline.setVisibility(View.GONE);
 
         if (status.length() > 20)

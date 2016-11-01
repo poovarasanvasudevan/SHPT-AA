@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.bumptech.glide.Glide;
 import com.mikepenz.fastadapter.adapters.FastItemAdapter;
 import com.parse.ParseUser;
 import com.poovarasan.miu.R;
@@ -57,6 +58,15 @@ public class Settings extends AppCompatActivity {
 
         activitySettingsBinding.displayStatus.setText(status);
         activitySettingsBinding.displayName.setText(dName);
+        byte[] dImage = ParseUser.getCurrentUser().getBytes("image");
+
+        if (dImage == null) {
+            activitySettingsBinding.profileImage.setImageResource(R.drawable.default_image);
+        } else {
+            Glide.with(getApplicationContext())
+                    .load(dImage)
+                    .into(activitySettingsBinding.profileImage);
+        }
 
         activitySettingsBinding.displayStatus.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -66,9 +76,6 @@ public class Settings extends AppCompatActivity {
                 //  ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(Settings.this, view, DetailActivity.EXTRA_IMAGE);
                 ActivityCompat.startActivity(Settings.this, new Intent(Settings.this, Status.class),
                         null);
-
-                // Intent i = new Intent(Settings.this, Status.class);
-                //startActivity(i);
             }
         });
 
@@ -78,9 +85,6 @@ public class Settings extends AppCompatActivity {
 
                 ActivityCompat.startActivity(Settings.this, new Intent(Settings.this, Profile.class),
                         null);
-
-                //  Intent i = new Intent(Settings.this, Profile.class);
-                // startActivity(i);
             }
         });
 
@@ -150,5 +154,16 @@ public class Settings extends AppCompatActivity {
 
         activitySettingsBinding.displayStatus.setText(status);
         activitySettingsBinding.displayName.setText(dName);
+
+        byte[] dImage = ParseUser.getCurrentUser().getBytes("image");
+
+        if (dImage == null) {
+            activitySettingsBinding.profileImage.setImageResource(R.drawable.default_image);
+        } else {
+            Glide
+                    .with(getApplicationContext())
+                    .load(dImage)
+                    .into(activitySettingsBinding.profileImage);
+        }
     }
 }
