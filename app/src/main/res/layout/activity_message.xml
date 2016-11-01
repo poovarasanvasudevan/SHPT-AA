@@ -54,33 +54,33 @@
                         <LinearLayout
                             android:id="@+id/profileButton"
                             android:layout_width="wrap_content"
-                            android:padding="4dp"
                             android:layout_height="wrap_content"
-                            android:gravity="center_vertical">
+                            android:gravity="center_vertical"
+                            android:padding="4dp">
 
                             <com.poovarasan.miu.widget.CircleImageView
                                 android:id="@+id/toolbarProfileImage"
                                 android:layout_width="40dp"
-                                android:src="@drawable/default_image"
-                                android:layout_height="40dp" />
+                                android:layout_height="40dp"
+                                android:src="@drawable/default_image" />
 
                             <LinearLayout
                                 android:layout_width="wrap_content"
                                 android:layout_height="50dp"
                                 android:layout_marginLeft="10dp"
-                                android:padding="3dp"
-                                android:orientation="vertical">
+                                android:orientation="vertical"
+                                android:padding="3dp">
 
                                 <TextView
                                     android:id="@+id/toolBarTitle"
                                     style="@style/TextAppearance.AppCompat.Title"
                                     android:layout_width="wrap_content"
                                     android:layout_height="match_parent"
-                                    android:textSize="18dp"
                                     android:layout_weight="1"
                                     android:ellipsize="end"
                                     android:singleLine="true"
-                                    android:text="Poovarasan Vasudevan" />
+                                    android:text="Poovarasan Vasudevan"
+                                    android:textSize="18dp" />
 
                                 <TextView
                                     android:id="@+id/toolBarSubtitle"
@@ -88,10 +88,10 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="match_parent"
                                     android:layout_weight="1"
-                                    android:textSize="14dp"
                                     android:ellipsize="end"
                                     android:singleLine="true"
-                                    android:text="Online" />
+                                    android:text="Online"
+                                    android:textSize="14dp" />
                             </LinearLayout>
                         </LinearLayout>
                     </com.balysv.materialripple.MaterialRippleLayout>
@@ -110,6 +110,76 @@
             android:layout_height="match_parent"
             android:layout_below="@+id/appbar">
 
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true">
+
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+
+                    android:padding="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <com.balysv.materialripple.MaterialRippleLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+
+                            <ImageView
+                                android:layout_width="match_parent"
+                                android:layout_height="40dp"
+                                android:layout_weight="7"
+                                android:padding="4dp"
+                                android:src="@drawable/ic_smile_o" />
+                        </com.balysv.materialripple.MaterialRippleLayout>
+
+
+                        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="2">
+
+                            <hani.momanii.supernova_emoji_library.Helper.EmojiconEditText
+                                android:id="@+id/messageText"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:background="@drawable/et"
+                                android:maxHeight="95dp"
+                                android:minHeight="35dp" />
+
+
+                            <ImageView
+                                android:layout_width="35dp"
+                                android:layout_height="35dp"
+                                android:layout_alignParentRight="true"
+                                android:layout_centerVertical="true"
+                                android:background="@color/transparent"
+                                android:padding="5dp"
+                                android:src="@drawable/ic_camera_alt" />
+                        </RelativeLayout>
+
+
+                        <com.balysv.materialripple.MaterialRippleLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+
+                            <ImageView
+                                android:layout_width="match_parent"
+                                android:layout_height="40dp"
+                                android:layout_weight="7"
+                                android:padding="2dp"
+                                android:src="@drawable/ic_action_send_now" />
+                        </com.balysv.materialripple.MaterialRippleLayout>
+                    </LinearLayout>
+                </RelativeLayout>
+            </android.support.v7.widget.CardView>
         </RelativeLayout>
     </RelativeLayout>
 </layout>

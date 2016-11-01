@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -106,12 +105,12 @@ public class Profile extends AppCompatActivity {
 
                                 int permissionCheck = ContextCompat.checkSelfPermission(Profile.this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
                                 if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-                                    EasyImage.openChooserWithGallery(Profile.this, "Pick an Image", 0);
+                                    EasyImage.openGallery(Profile.this, 0);
                                 } else {
                                     Nammu.askForPermission(Profile.this, Manifest.permission.WRITE_EXTERNAL_STORAGE, new PermissionCallback() {
                                         @Override
                                         public void permissionGranted() {
-                                            EasyImage.openChooserWithGallery(Profile.this, "Pick an Image", 0);
+                                            EasyImage.openGallery(Profile.this, 0);
                                         }
 
                                         @Override
@@ -200,14 +199,11 @@ public class Profile extends AppCompatActivity {
                     @Override
                     public void done(ParseException e) {
                         activityProfileBinding.myProfilePic.setImageBitmap(null);
-
-                        Log.i("File Uploaded ", "Done");
                         Glide.with(getApplicationContext())
                                 .load(imageFile)
                                 .into(activityProfileBinding.myProfilePic);
+                        Toast.makeText(getApplicationContext(), "Image Updated Succesfully", Toast.LENGTH_SHORT).show();
 
-
-                        Log.i("Updation", "Success");
                     }
                 });
             }

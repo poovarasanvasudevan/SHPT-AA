@@ -87,7 +87,7 @@
         <activity
             android:name=".activity.DataUsage"
             android:label="Data Usage" />
-        <activity android:name=".activity.MessageActivity" android:label=""/>
+        <activity android:name=".activity.MessageActivity" android:label=""  android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity
             android:name=".activity.Profile"
             android:label="Profile"
