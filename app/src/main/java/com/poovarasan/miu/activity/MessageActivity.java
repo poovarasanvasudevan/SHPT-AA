@@ -3,6 +3,8 @@ package com.poovarasan.miu.activity;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,6 +29,34 @@ public class MessageActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        mikeModification(0);
+
+        activityMessageBinding.messageText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                mikeModification(charSequence.length());
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+                mikeModification(editable.length());
+            }
+        });
+    }
+
+    void mikeModification(int count) {
+        if (count > 0) {
+            activityMessageBinding.sendBtn.setImageResource(R.drawable.ic_action_send_now);
+        } else {
+            activityMessageBinding.sendBtn.setImageResource(R.drawable.ic_mic);
+        }
     }
 
     @Override
