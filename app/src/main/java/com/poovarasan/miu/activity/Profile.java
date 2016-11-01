@@ -1,18 +1,20 @@
 package com.poovarasan.miu.activity;
 
 import android.databinding.DataBindingUtil;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.poovarasan.miu.R;
+import com.poovarasan.miu.adapter.ImageChooseAdapter;
 import com.poovarasan.miu.databinding.ActivityProfileBinding;
 
 public class Profile extends AppCompatActivity {
@@ -56,6 +58,37 @@ public class Profile extends AppCompatActivity {
                         }
                     });
                 }
+            }
+        });
+
+        activityProfileBinding.changeImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                final MaterialDialog.Builder builder = new MaterialDialog.Builder(Profile.this);
+                int image[] = new int[]{
+                        R.drawable.ic_photo,
+                        R.drawable.ic_camera_alt,
+                        R.drawable.ic_account_circle
+                };
+                ImageChooseAdapter imageChooseAdapter = new ImageChooseAdapter(getApplicationContext(), R.array.changeImageMenu, image);
+                imageChooseAdapter.setCallback(new ImageChooseAdapter.Callback() {
+                    @Override
+                    public void onItemClicked(int index) {
+                        Toast.makeText(getApplicationContext(), "Index : " + index, Toast.LENGTH_LONG).show();
+
+                    }
+
+                    @Override
+                    public void onButtonClicked(int index) {
+
+                    }
+                });
+                builder
+                        .title("Choose Action")
+                        .adapter(imageChooseAdapter, null)
+                        .autoDismiss(true)
+                        .show();
             }
         });
     }

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="changeImageMenu">
+        <item>Choose with Gallery</item>
+        <item>Choose with Camera</item>
+        <item>No Image</item>
+    </array>
+
+</resources>

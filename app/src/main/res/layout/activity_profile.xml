@@ -36,12 +36,28 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <ImageView
-                        android:id="@+id/my_profile_pic"
+                    <RelativeLayout
                         android:layout_width="match_parent"
-                        android:layout_height="200dp"
-                        android:src="@drawable/default_image" />
+                        android:layout_height="200dp">
 
+                        <ImageView
+                            android:id="@+id/my_profile_pic"
+                            android:layout_width="match_parent"
+                            android:layout_height="200dp"
+                            android:src="@drawable/default_image" />
+
+                        <ImageButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentBottom="true"
+                            android:layout_alignParentRight="true"
+                            android:background="@color/transparent"
+                            android:id="@+id/changeImage"
+                            android:foregroundTint="?colorPrimary"
+                            android:src="@drawable/ic_edit"
+                            android:layout_margin="10dp"
+                            android:tint="?colorPrimary" />
+                    </RelativeLayout>
 
                     <android.support.v7.widget.CardView
                         android:layout_width="match_parent"
