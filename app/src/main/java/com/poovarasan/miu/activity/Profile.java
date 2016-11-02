@@ -1,6 +1,7 @@
 package com.poovarasan.miu.activity;
 
 import android.Manifest;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
@@ -21,10 +22,13 @@ import com.parse.SaveCallback;
 import com.poovarasan.miu.R;
 import com.poovarasan.miu.adapter.ImageChooseAdapter;
 import com.poovarasan.miu.databinding.ActivityProfileBinding;
+import com.poovarasan.miu.sync.LocationSyncService;
 
 import java.io.File;
 import java.io.FileInputStream;
 
+import me.tatarka.support.job.JobInfo;
+import me.tatarka.support.job.JobScheduler;
 import pl.aprilapps.easyphotopicker.DefaultCallback;
 import pl.aprilapps.easyphotopicker.EasyImage;
 import pl.tajchert.nammu.Nammu;
@@ -32,11 +36,14 @@ import pl.tajchert.nammu.PermissionCallback;
 
 public class Profile extends AppCompatActivity {
 
+    private static final int JOB_ID = 4091;
+    private static final long POLL_FREQUENCY = 1000 * 60 * 10;
     Toolbar toolbar;
     ActivityProfileBinding activityProfileBinding;
     boolean edit = true;
     MaterialDialog.Builder builder;
     MaterialDialog materialDialog;
+    JobScheduler jobScheduler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +68,25 @@ public class Profile extends AppCompatActivity {
                     .into(activityProfileBinding.myProfilePic);
         }
 
+
+        int permissionCheck = ContextCompat.checkSelfPermission(Profile.this, Manifest.permission.ACCESS_FINE_LOCATION);
+        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+            setupJob();
+        } else {
+
+            Nammu.askForPermission(Profile.this, Manifest.permission.ACCESS_FINE_LOCATION, new PermissionCallback() {
+                @Override
+                public void permissionGranted() {
+                    setupJob();
+                }
+
+                @Override
+                public void permissionRefused() {
+
+                    Toast.makeText(getApplicationContext(), "Permission Refsued unable to pick", Toast.LENGTH_LONG).show();
+                }
+            });
+        }
 
         activityProfileBinding.profileNameEditButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -177,6 +203,16 @@ public class Profile extends AppCompatActivity {
             finish();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void setupJob() {
+        jobScheduler = JobScheduler.getInstance(this);
+        JobInfo.Builder builder = new JobInfo.Builder(JOB_ID, new ComponentName(this, LocationSyncService.class));
+        //set periodic polling that needs net connection and works across device reboots
+        builder.setPeriodic(POLL_FREQUENCY)
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)
+                .setPersisted(true);
+        jobScheduler.schedule(builder.build());
     }
 
     @Override

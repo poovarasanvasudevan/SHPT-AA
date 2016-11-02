@@ -31,6 +31,7 @@ public class Home extends AppCompatActivity implements TabLayout.OnTabSelectedLi
     //private static final long POLL_FREQUENCY = 1000 * 6;
     ActivityHomeBinding activityHomeBinding;
     private JobScheduler mJobScheduler;
+    private JobScheduler locationJob;
     int currentTab;
 
     @Override
@@ -57,6 +58,7 @@ public class Home extends AppCompatActivity implements TabLayout.OnTabSelectedLi
         activityHomeBinding.pager.setOffscreenPageLimit(3);
 
         setupJob();
+
         //
     }
 

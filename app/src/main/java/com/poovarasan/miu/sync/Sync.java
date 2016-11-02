@@ -59,7 +59,6 @@ public class Sync {
 
                 @Override
                 public void done(List<ParseUser> objects, ParseException e) {
-
                     ParseQuery query = ParseQuery.getQuery("MyUsers");
                     query.fromLocalDatastore();
                     query.findInBackground(new FindCallback<ParseObject>() {
@@ -68,7 +67,6 @@ public class Sync {
                             ParseObject.unpinAllInBackground(objects);
                         }
                     });
-
                     if (objects != null && objects.size() > 0) {
                         for (ParseUser parseUser : objects) {
                             ParseObject users = new ParseObject("MyUsers");

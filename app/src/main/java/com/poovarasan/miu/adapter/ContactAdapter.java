@@ -1,6 +1,8 @@
 package com.poovarasan.miu.adapter;
 
 import android.content.Context;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
@@ -19,11 +21,13 @@ import hani.momanii.supernova_emoji_library.Helper.EmojiconTextView;
  * Created by poovarasanv on 20/10/16.
  */
 
-public class ContactAdapter extends AbstractItem<ContactAdapter, ContactAdapter.ViewHolder> {
+public class ContactAdapter extends AbstractItem<ContactAdapter, ContactAdapter.ViewHolder> implements Parcelable {
 
     byte[] image;
     String name, status;
     Context context;
+
+
 
     public ContactAdapter(byte[] image, String name, String status,Context context) {
         this.image = image;
@@ -111,4 +115,34 @@ public class ContactAdapter extends AbstractItem<ContactAdapter, ContactAdapter.
             this.isOnline = (ImageView) itemView.findViewById(R.id.isOnline);
         }
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeByteArray(this.image);
+        dest.writeString(this.name);
+        dest.writeString(this.status);
+    }
+
+    protected ContactAdapter(Parcel in) {
+        this.image = in.createByteArray();
+        this.name = in.readString();
+        this.status = in.readString();
+    }
+
+    public static final Parcelable.Creator<ContactAdapter> CREATOR = new Parcelable.Creator<ContactAdapter>() {
+        @Override
+        public ContactAdapter createFromParcel(Parcel source) {
+            return new ContactAdapter(source);
+        }
+
+        @Override
+        public ContactAdapter[] newArray(int size) {
+            return new ContactAdapter[size];
+        }
+    };
 }

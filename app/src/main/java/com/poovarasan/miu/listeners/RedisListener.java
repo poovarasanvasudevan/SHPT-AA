@@ -159,26 +159,29 @@ public class RedisListener extends JedisPubSub {
             List<String> messageQueue = App.getRedis().lrange(ParseUser.getCurrentUser().getUsername() + ".messagequeue", 0, -1);
             Simple simple = null;
             boolean isMessageAvailable = false;
+            String fullMessage = "";
             for (String message : messageQueue) {
                 App.getRedis().rpop(ParseUser.getCurrentUser().getUsername() + ".messagequeue");
 
                 isMessageAvailable = true;
-                String fullMessage = "\n" + message;
+                fullMessage += "\n" + message;
+            }
+
+            if (isMessageAvailable) {
 
                 simple = PugNotification.with(context)
                         .load()
-                        .title("New Notification")
+                        .title("New Messages")
                         .message(fullMessage)
                         .smallIcon(R.drawable.notification)
                         .largeIcon(R.drawable.notification_big)
                         .flags(Notification.DEFAULT_ALL)
+                        .bigTextStyle(fullMessage)
                         .vibrate(new long[]{1000L, 200L, 300L})
                         .simple();
+                simple.build();
 
             }
-
-            if (isMessageAvailable)
-                simple.build();
             return null;
         }
     }

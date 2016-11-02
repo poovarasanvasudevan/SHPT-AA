@@ -62,14 +62,12 @@ public class Status extends AppCompatActivity {
                 user.put("status", status);
                 user.saveEventually();
 
-
                 ParseObject parseObject = ParseObject.create("Status");
                 parseObject.put("status", status);
                 parseObject.put("updated", new Date());
                 parseObject.put("active", true);
                 parseObject.pinInBackground();
                 Toast.makeText(getApplicationContext(), "Status Updated Succesfully", Toast.LENGTH_LONG).show();
-
 
             } else {
                 Toast.makeText(getApplicationContext(), "No Status to Update", Toast.LENGTH_LONG).show();

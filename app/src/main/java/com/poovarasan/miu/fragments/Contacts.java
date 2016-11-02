@@ -156,7 +156,9 @@ public class Contacts extends Fragment {
                 fastAdapter.withOnClickListener(new FastAdapter.OnClickListener<ContactAdapter>() {
                     @Override
                     public boolean onClick(View v, IAdapter<ContactAdapter> adapter, ContactAdapter item, int position) {
-                        ActivityCompat.startActivity(getActivity(), new Intent(getActivity(), MessageActivity.class), null);
+                        Intent intent = new Intent(getActivity(), MessageActivity.class);
+                        intent.putExtra("contactDetails", item);
+                        ActivityCompat.startActivity(getActivity(), intent, null);
                         return false;
                     }
                 });

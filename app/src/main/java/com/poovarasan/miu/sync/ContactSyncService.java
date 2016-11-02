@@ -23,6 +23,4 @@ public class ContactSyncService extends JobService {
     public boolean onStopJob(JobParameters params) {
         return false;
     }
-
-
 }

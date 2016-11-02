@@ -6,4 +6,9 @@
         <item>No Image</item>
     </array>
 
+    <array name="muteArray">
+        <item>1 Hour</item>
+        <item>4 Hours</item>
+        <item>8 Hours</item>
+    </array>
 </resources>

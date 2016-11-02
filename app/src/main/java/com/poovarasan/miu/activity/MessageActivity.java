@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
@@ -14,7 +15,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.bumptech.glide.Glide;
 import com.poovarasan.miu.R;
+import com.poovarasan.miu.adapter.ContactAdapter;
 import com.poovarasan.miu.databinding.ActivityMessageBinding;
 
 import java.io.File;
@@ -35,6 +39,17 @@ public class MessageActivity extends AppCompatActivity {
         activityMessageBinding = DataBindingUtil.setContentView(this, R.layout.activity_message);
 
         setSupportActionBar(activityMessageBinding.toolbar);
+
+        final Intent intent = getIntent();
+        final ContactAdapter contactAdapter = intent.getParcelableExtra("contactDetails");
+
+        Glide.with(this)
+                .load(contactAdapter.getImage())
+                .into(activityMessageBinding.toolbarProfileImage);
+
+        activityMessageBinding.toolBarTitle.setText(contactAdapter.getName());
+        activityMessageBinding.toolBarSubtitle.setText("Online Now");
+
 
         activityMessageBinding.toolBarBackBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,6 +103,15 @@ public class MessageActivity extends AppCompatActivity {
                         }
                     });
                 }
+            }
+        });
+
+        activityMessageBinding.profileButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent1 = new Intent(MessageActivity.this,UserProfile.class);
+                intent1.putExtra("contactDetail",contactAdapter);
+                ActivityCompat.startActivity(MessageActivity.this,intent1,null);
             }
         });
     }
@@ -148,6 +172,29 @@ public class MessageActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.muteUser: {
+
+                new MaterialDialog.Builder(this)
+                        .title("Mute User for")
+                        .items(R.array.muteArray)
+                        .itemsCallbackSingleChoice(-1, new MaterialDialog.ListCallbackSingleChoice() {
+                            @Override
+                            public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                                /**
+                                 * If you use alwaysCallSingleChoiceCallback(), which is discussed below,
+                                 * returning false here won't allow the newly selected radio button to actually be selected.
+                                 **/
+                                return true;
+                            }
+                        })
+                        .positiveText("Mute")
+                        .show();
+                break;
+            }
+        }
+
         return super.onOptionsItemSelected(item);
     }
 }

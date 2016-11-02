@@ -13,14 +13,39 @@
         app:showAsAction="always" />
 
     <item
+        android:title="View Contact"
+        app:showAsAction="never" />
+
+    <item
+        android:title="Media"
+        app:showAsAction="never" />
+
+    <item
+        android:title="Search"
+        app:showAsAction="never" />
+
+    <item
+        android:title="Wallpaper"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/blockUser"
         android:title="Block"
         app:showAsAction="never" />
 
     <item
-        android:title="Settings"
+        android:title="Clear Chat"
         app:showAsAction="never" />
 
     <item
+        android:title="Email Chat"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/muteUser"
         android:title="Mute"
+        app:showAsAction="never" />
+
+    <item
+        android:title="Add Shortcut"
         app:showAsAction="never" />
 </menu>
