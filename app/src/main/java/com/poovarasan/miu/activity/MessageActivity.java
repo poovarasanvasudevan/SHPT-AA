@@ -1,16 +1,29 @@
 package com.poovarasan.miu.activity;
 
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.poovarasan.miu.R;
 import com.poovarasan.miu.databinding.ActivityMessageBinding;
+
+import java.io.File;
+
+import hani.momanii.supernova_emoji_library.Actions.EmojIconActions;
+import pl.aprilapps.easyphotopicker.DefaultCallback;
+import pl.aprilapps.easyphotopicker.EasyImage;
+import pl.tajchert.nammu.Nammu;
+import pl.tajchert.nammu.PermissionCallback;
 
 public class MessageActivity extends AppCompatActivity {
 
@@ -32,6 +45,11 @@ public class MessageActivity extends AppCompatActivity {
 
         mikeModification(0);
 
+
+        EmojIconActions emojIcon = new EmojIconActions(this, activityMessageBinding.messageText, activityMessageBinding.messageText, activityMessageBinding.emojiButton);
+        emojIcon.ShowEmojIcon();
+
+        activityMessageBinding.messageText.setTextSize(18);
         activityMessageBinding.messageText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -49,6 +67,29 @@ public class MessageActivity extends AppCompatActivity {
                 mikeModification(editable.length());
             }
         });
+
+        activityMessageBinding.cameraButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int permissionCheck = ContextCompat.checkSelfPermission(MessageActivity.this, Manifest.permission.CAMERA);
+                int permissionCheckFile = ContextCompat.checkSelfPermission(MessageActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                if (permissionCheck == PackageManager.PERMISSION_GRANTED && permissionCheckFile == PackageManager.PERMISSION_GRANTED) {
+                    EasyImage.openCamera(MessageActivity.this, 0);
+                } else {
+                    Nammu.askForPermission(MessageActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, new PermissionCallback() {
+                        @Override
+                        public void permissionGranted() {
+                            EasyImage.openCamera(MessageActivity.this, 0);
+                        }
+
+                        @Override
+                        public void permissionRefused() {
+                            Toast.makeText(getApplicationContext(), "Permission Refsued unable to pick", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+            }
+        });
     }
 
     void mikeModification(int count) {
@@ -57,6 +98,46 @@ public class MessageActivity extends AppCompatActivity {
         } else {
             activityMessageBinding.sendBtn.setImageResource(R.drawable.ic_mic);
         }
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        EasyImage.handleActivityResult(requestCode, resultCode, data, this, new DefaultCallback() {
+            @Override
+            public void onImagePickerError(Exception e, EasyImage.ImageSource source, int type) {
+                //Some error handling
+            }
+
+            @Override
+            public void onImagePicked(final File imageFile, EasyImage.ImageSource source, int type) {
+
+                if (source == EasyImage.ImageSource.GALLERY) {
+
+                } else if (source == EasyImage.ImageSource.CAMERA) {
+
+                } else if (source == EasyImage.ImageSource.DOCUMENTS) {
+
+                }
+            }
+
+            @Override
+            public void onCanceled(EasyImage.ImageSource source, int type) {
+                //Cancel handling, you might wanna remove taken photo if it was canceled
+                if (source == EasyImage.ImageSource.CAMERA) {
+                    File photoFile = EasyImage.lastlyTakenButCanceledPhoto(MessageActivity.this);
+                    if (photoFile != null) photoFile.delete();
+                }
+            }
+        });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        Nammu.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     @Override

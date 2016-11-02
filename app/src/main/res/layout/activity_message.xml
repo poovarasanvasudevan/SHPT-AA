@@ -60,14 +60,14 @@
 
                             <com.poovarasan.miu.widget.CircleImageView
                                 android:id="@+id/toolbarProfileImage"
-                                android:layout_width="40dp"
-                                android:layout_height="40dp"
+                                android:layout_width="35dp"
+                                android:layout_height="35dp"
                                 android:src="@drawable/default_image" />
 
                             <LinearLayout
                                 android:layout_width="wrap_content"
                                 android:layout_height="50dp"
-                                android:layout_marginLeft="10dp"
+                                android:layout_marginLeft="7dp"
                                 android:orientation="vertical"
                                 android:padding="3dp">
 
@@ -88,9 +88,13 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="match_parent"
                                     android:layout_weight="1"
-                                    android:ellipsize="end"
                                     android:singleLine="true"
-                                    android:text="Online"
+                                    android:ellipsize="marquee"
+                                    android:marqueeRepeatLimit ="1"
+                                    android:scrollHorizontally="true"
+                                    android:focusable="true"
+                                    android:focusableInTouchMode="true"
+                                    android:text="Last Seen Yesterday 18.25"
                                     android:textSize="14dp" />
                             </LinearLayout>
                         </LinearLayout>
@@ -136,9 +140,11 @@
                         <com.balysv.materialripple.MaterialRippleLayout
                             android:layout_width="match_parent"
                             android:layout_height="40dp"
+                            android:layout_gravity="center_vertical"
                             android:layout_weight="7">
 
                             <ImageView
+                                android:id="@+id/emojiButton"
                                 android:layout_width="match_parent"
                                 android:layout_height="40dp"
                                 android:padding="4dp"
@@ -158,16 +164,20 @@
                                 android:layout_weight="1"
                                 android:background="@drawable/et"
                                 android:maxHeight="95dp"
-                                android:minHeight="35dp" />
+                                android:minHeight="30dp"
+                                android:textSize="20sp"
+                                app:emojiconSize="20sp" />
 
 
                             <ImageView
-                                android:layout_width="35dp"
-                                android:layout_height="35dp"
+                                android:id="@+id/cameraButton"
+                                android:layout_width="30dp"
+                                android:layout_height="30dp"
                                 android:layout_alignParentRight="true"
                                 android:layout_centerVertical="true"
                                 android:background="@color/transparent"
-                                android:padding="5dp"
+                                android:layout_marginRight="5dp"
+                                android:padding="2dp"
                                 android:src="@drawable/ic_camera_alt" />
                         </RelativeLayout>
 
@@ -175,13 +185,14 @@
                         <com.balysv.materialripple.MaterialRippleLayout
                             android:layout_width="match_parent"
                             android:layout_height="40dp"
+                            android:layout_gravity="center_vertical"
                             android:layout_weight="7">
 
                             <ImageView
                                 android:id="@+id/sendBtn"
-                                android:layout_width="match_parent"
-                                android:layout_height="40dp"
                                 android:padding="5dp"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
                                 android:src="@drawable/ic_action_send_now" />
                         </com.balysv.materialripple.MaterialRippleLayout>
                     </LinearLayout>

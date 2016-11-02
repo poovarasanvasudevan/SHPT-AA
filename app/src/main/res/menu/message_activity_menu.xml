@@ -8,6 +8,11 @@
         app:showAsAction="always" />
 
     <item
+        android:icon="@drawable/ic_attach_file"
+        android:title="Call"
+        app:showAsAction="always" />
+
+    <item
         android:title="Block"
         app:showAsAction="never" />
 
