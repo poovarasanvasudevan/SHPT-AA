@@ -1,6 +1,18 @@
 <resources>
-    <string name="app_name">MIU</string>
+    <string name="app_name">MIU Connect</string>
     <string name="profile_action">Sample profile</string>
     <string name="view_profile">View Profile</string>
+    <string name="clear_string">Also Delete Media Files</string>
+    <string name="email_attachement_text">On Attaching media that will cause larger email Size</string>
+    <string name="email_attachememt_dont_attach">Don`t Attach</string>
+    <string name="email_attachememt_attach">Attach</string>
+    <string name="email_attachememt_heading">Email Chat</string>
+    <string name="clear_chat_heading">Are You Sure ?</string>
+    <string name="clear_char_content">"Clearing Chat That Deletes All the Message from Between you and "</string>
+    <string name="yes_button">Yes</string>
+    <string name="no_button">No</string>
+    <string name="mute_user_title">Mute User for</string>
+    <string name="mute_button_text">Mute</string>
+    <string name="permission_refeused">Permission Refsued unable to pick</string>
 
 </resources>

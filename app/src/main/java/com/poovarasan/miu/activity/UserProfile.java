@@ -11,6 +11,8 @@ import com.poovarasan.miu.R;
 import com.poovarasan.miu.adapter.ContactAdapter;
 import com.poovarasan.miu.databinding.ActivityUserProfileBinding;
 
+import java.io.File;
+
 public class UserProfile extends AppCompatActivity {
 
     ActivityUserProfileBinding activityUserProfileBinding;
@@ -28,8 +30,10 @@ public class UserProfile extends AppCompatActivity {
         ContactAdapter contactAdapter = getIntent().getParcelableExtra("contactDetail");
         activityUserProfileBinding.collapseToolbar.setTitle(contactAdapter.getName());
         Glide.with(this)
-                .load(contactAdapter.getImage())
+                .load(new File(contactAdapter.getImage()))
                 .into(activityUserProfileBinding.bgheader);
+
+        activityUserProfileBinding.MyToolbar.setSubtitle("Online");
     }
 
     @Override
@@ -40,6 +44,15 @@ public class UserProfile extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case android.R.id.home: {
+                finish();
+                break;
+            }
+        }
         return super.onOptionsItemSelected(item);
     }
+
+
 }

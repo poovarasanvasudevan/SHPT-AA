@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bumptech.glide.Glide;
 import com.poovarasan.miu.R;
@@ -32,6 +34,7 @@ import pl.tajchert.nammu.PermissionCallback;
 public class MessageActivity extends AppCompatActivity {
 
     ActivityMessageBinding activityMessageBinding;
+    ContactAdapter contactAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,10 +44,10 @@ public class MessageActivity extends AppCompatActivity {
         setSupportActionBar(activityMessageBinding.toolbar);
 
         final Intent intent = getIntent();
-        final ContactAdapter contactAdapter = intent.getParcelableExtra("contactDetails");
+        contactAdapter = intent.getParcelableExtra("contactDetails");
 
         Glide.with(this)
-                .load(contactAdapter.getImage())
+                .load(new File(contactAdapter.getImage()))
                 .into(activityMessageBinding.toolbarProfileImage);
 
         activityMessageBinding.toolBarTitle.setText(contactAdapter.getName());
@@ -99,7 +102,7 @@ public class MessageActivity extends AppCompatActivity {
 
                         @Override
                         public void permissionRefused() {
-                            Toast.makeText(getApplicationContext(), "Permission Refsued unable to pick", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getApplicationContext(), R.string.permission_refeused, Toast.LENGTH_LONG).show();
                         }
                     });
                 }
@@ -109,9 +112,9 @@ public class MessageActivity extends AppCompatActivity {
         activityMessageBinding.profileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent1 = new Intent(MessageActivity.this,UserProfile.class);
-                intent1.putExtra("contactDetail",contactAdapter);
-                ActivityCompat.startActivity(MessageActivity.this,intent1,null);
+                Intent intent1 = new Intent(MessageActivity.this, UserProfile.class);
+                intent1.putExtra("contactDetail", contactAdapter);
+                ActivityCompat.startActivity(MessageActivity.this, intent1, null);
             }
         });
     }
@@ -177,19 +180,52 @@ public class MessageActivity extends AppCompatActivity {
             case R.id.muteUser: {
 
                 new MaterialDialog.Builder(this)
-                        .title("Mute User for")
+                        .title(R.string.mute_user_title)
                         .items(R.array.muteArray)
                         .itemsCallbackSingleChoice(-1, new MaterialDialog.ListCallbackSingleChoice() {
                             @Override
                             public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
-                                /**
-                                 * If you use alwaysCallSingleChoiceCallback(), which is discussed below,
-                                 * returning false here won't allow the newly selected radio button to actually be selected.
-                                 **/
                                 return true;
                             }
                         })
-                        .positiveText("Mute")
+                        .positiveText(R.string.mute_button_text)
+                        .show();
+                break;
+            }
+
+            case R.id.clearChat: {
+
+                new MaterialDialog
+                        .Builder(this)
+                        .title(R.string.clear_chat_heading)
+                        .content(getString(R.string.clear_char_content) + contactAdapter.getName() + " in Miu")
+                        .positiveText(R.string.yes_button)
+                        .negativeText(R.string.no_button)
+                        .checkBoxPromptRes(R.string.clear_string, false, null)
+                        .show();
+
+                break;
+            }
+
+            case R.id.emailChat: {
+
+                new MaterialDialog.Builder(this)
+                        .title(R.string.email_attachememt_heading)
+                        .content(R.string.email_attachement_text)
+                        .positiveText(R.string.email_attachememt_dont_attach)
+                        .negativeText(R.string.email_attachememt_attach)
+                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+
+                            }
+                        })
+                        .onNegative(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+
+                            }
+                        })
                         .show();
                 break;
             }

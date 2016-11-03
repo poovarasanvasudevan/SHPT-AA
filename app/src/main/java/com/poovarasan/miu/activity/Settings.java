@@ -95,6 +95,7 @@ public class Settings extends AppCompatActivity {
                 "Data Usage",
                 "Contacts",
                 "Storage",
+                "Backup",
                 "About and Help",
         };
 
@@ -106,6 +107,7 @@ public class Settings extends AppCompatActivity {
                 getResources().getDrawable(R.drawable.ic_data_usage),
                 getResources().getDrawable(R.drawable.ic_contacts),
                 getResources().getDrawable(R.drawable.ic_database),
+                getResources().getDrawable(R.drawable.ic_backup),
                 getResources().getDrawable(R.drawable.ic_help)
         };
 
@@ -116,6 +118,7 @@ public class Settings extends AppCompatActivity {
                 DataUsage.class,
                 DataUsage.class,
                 DataUsage.class,
+                BackupActivity.class,
                 DataUsage.class
         };
         List<SettingMenuAdapter> settingMenuAdapters = new ArrayList<>();

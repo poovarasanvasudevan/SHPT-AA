@@ -74,7 +74,6 @@ public class Contacts extends Fragment {
 
         int permissionCheck = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_CONTACTS);
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-
             load();
         } else {
             Nammu.askForPermission(getActivity(), new String[]{Manifest.permission.READ_CONTACTS}, new PermissionCallback() {
@@ -145,7 +144,7 @@ public class Contacts extends Fragment {
                     Log.i("Loaded123", parseObject.getString("NUMBER"));
 
                     contactAdapters.add(new ContactAdapter(
-                            parseObject.getBytes("IMAGE"),
+                            parseObject.getString("IMAGE"),
                             parseObject.getString("NAME"),
                             parseObject.getString("STATUS"),
                             getActivity().getApplicationContext()

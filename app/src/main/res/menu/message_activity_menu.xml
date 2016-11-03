@@ -34,11 +34,13 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/clearChat"
         android:title="Clear Chat"
         app:showAsAction="never" />
 
     <item
         android:title="Email Chat"
+        android:id="@+id/emailChat"
         app:showAsAction="never" />
     <item
         android:id="@+id/muteUser"

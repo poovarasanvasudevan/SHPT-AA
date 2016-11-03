@@ -2,22 +2,26 @@ package com.poovarasan.miu.activity;
 
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.poovarasan.miu.R;
 import com.poovarasan.miu.databinding.ActivityLoginBinding;
 import com.poovarasan.miu.service.RedisService;
+import com.poovarasan.miu.sync.Sync;
 
 public class Login extends AppCompatActivity {
 
     Toolbar toolbar;
+    MaterialDialog materialDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,12 +48,14 @@ public class Login extends AppCompatActivity {
                     public void done(ParseUser user, ParseException e) {
                         if (user != null) {
 
-                            Intent intent = new Intent(Login.this, RedisService.class);
-                            startService(intent);
+                            materialDialog = new MaterialDialog.Builder(Login.this)
+                                    .title("Login Success")
+                                    .content("Sync Contacts...")
+                                    .progress(true, 0)
+                                    .show();
 
-                            Intent i = new Intent(Login.this, Home.class);
-                            startActivity(i);
-                            finish();
+                            new SyncLoader().execute();
+
                         } else {
                             Toast.makeText(getApplicationContext(), "Invalid Username or Password", Toast.LENGTH_LONG).show();
                         }
@@ -57,5 +63,30 @@ public class Login extends AppCompatActivity {
                 });
             }
         });
+    }
+
+    class SyncLoader extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+            Sync sync = new Sync(getApplicationContext());
+            sync.makeSync();
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+
+            materialDialog.dismiss();
+            Intent intent = new Intent(Login.this, RedisService.class);
+            startService(intent);
+
+            Intent i = new Intent(Login.this, Home.class);
+            startActivity(i);
+            finish();
+
+            super.onPostExecute(aVoid);
+        }
     }
 }

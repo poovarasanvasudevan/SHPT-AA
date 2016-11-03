@@ -13,6 +13,7 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.poovarasan.miu.application.App;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,12 +70,32 @@ public class Sync {
                     });
                     if (objects != null && objects.size() > 0) {
                         for (ParseUser parseUser : objects) {
-                            ParseObject users = new ParseObject("MyUsers");
-                            users.put("NUMBER", parseUser.getUsername());
-                            users.put("STATUS", parseUser.get("status"));
-                            users.put("IMAGE", parseUser.get("image") == null ? App.getDefaultImage(context) : parseUser.get("image"));
-                            users.put("NAME", getContactName(context, parseUser.getUsername()));
-                            users.pinInBackground();
+                            if (parseUser.getUsername() != ParseUser.getCurrentUser().getUsername()) {
+                                ParseObject users = new ParseObject("MyUsers");
+                                users.put("NUMBER", parseUser.getUsername());
+                                users.put("STATUS", parseUser.get("status"));
+
+                                if (parseUser.get("image") == null) {
+                                    App
+                                            .getStorage(context)
+                                            .createFile("Miu/Images/ProfilePic", parseUser.getUsername() + ".png", App.byteToBitmap(App.getDefaultImage(context)));
+
+                                    File profilePic = App.getStorage(context).getFile("Miu/Images/ProfilePic", parseUser.getUsername() + ".png");
+                                    users.put("IMAGE", profilePic.getAbsolutePath());
+                                } else {
+
+                                    App
+                                            .getStorage(context)
+                                            .createFile("Miu/Images/ProfilePic", parseUser.getUsername() + ".png", App.byteToBitmap(parseUser.getBytes("image")));
+
+                                    File profilePic = App.getStorage(context).getFile("Miu/Images/ProfilePic", parseUser.getUsername() + ".png");
+                                    users.put("IMAGE", profilePic.getAbsolutePath());
+                                }
+
+
+                                users.put("NAME", getContactName(context, parseUser.getUsername()));
+                                users.pinInBackground();
+                            }
                         }
                     }
                 }

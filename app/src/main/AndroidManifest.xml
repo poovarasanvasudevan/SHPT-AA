@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.poovarasan.miu">
+    package="com.poovarasan.miu"
+    android:installLocation="auto">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -23,7 +24,8 @@
     <application
         android:name=".application.App"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:allowClearUserData="false"
+        android:icon="@drawable/miublue"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
@@ -101,7 +103,8 @@
             android:name=".activity.Profile"
             android:label="Profile"
             android:windowSoftInputMode="adjustPan" />
-        <activity android:name=".activity.UserProfile"></activity>
+        <activity android:name=".activity.UserProfile" />
+        <activity android:name=".activity.BackupActivity" android:label="Backup"></activity>
     </application>
 
 </manifest>

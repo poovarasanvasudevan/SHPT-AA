@@ -7,7 +7,8 @@
     app:mrl_rippleColor="#999"
     app:mrl_rippleOverlay="true">
 
-    <android.support.v7.widget.CardView
+    <LinearLayout
+        android:background="@color/md_white_1000"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -66,5 +67,5 @@
                     android:text="Poosan" />
             </LinearLayout>
         </LinearLayout>
-    </android.support.v7.widget.CardView>
+    </LinearLayout>
 </com.balysv.materialripple.MaterialRippleLayout>

@@ -16,6 +16,8 @@ import com.parse.ParseInstallation;
 import com.parse.ParseUser;
 import com.poovarasan.miu.R;
 import com.poovarasan.miu.service.RedisService;
+import com.sromku.simple.storage.SimpleStorage;
+import com.sromku.simple.storage.Storage;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Random;
@@ -30,6 +32,7 @@ public class App extends Application {
 
     static Jedis jedis;
     static Resources resources;
+    static Storage storage = null;
 
     @Override
     public void onCreate() {
@@ -113,6 +116,36 @@ public class App extends Application {
         byte[] bitmapdata = stream.toByteArray();
 
         return bitmapdata;
+    }
+
+    public static Storage getStorage(Context context) {
+
+        if (storage == null) {
+            if (SimpleStorage.isExternalStorageWritable()) {
+                storage = SimpleStorage.getExternalStorage();
+
+                storage.createDirectory("Miu");
+                storage.createDirectory("Miu/Images/ProfilePic");
+                storage.createDirectory("Miu/Messages/Media");
+                storage.createDirectory("Miu/Backup");
+
+
+            } else {
+                storage = SimpleStorage.getInternalStorage(context);
+
+                storage.createDirectory("Miu");
+                storage.createDirectory("Miu/Images/ProfilePic");
+                storage.createDirectory("Miu/Messages/Media");
+                storage.createDirectory("Miu/Backup");
+
+            }
+        }
+
+        return storage;
+    }
+
+    public static Bitmap byteToBitmap(byte[] bytes) {
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
     }
 
 

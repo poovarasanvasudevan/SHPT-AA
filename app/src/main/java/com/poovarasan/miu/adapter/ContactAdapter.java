@@ -13,6 +13,7 @@ import com.mikepenz.fastadapter.items.AbstractItem;
 import com.poovarasan.miu.R;
 import com.poovarasan.miu.widget.CircleImageView;
 
+import java.io.File;
 import java.util.List;
 
 import hani.momanii.supernova_emoji_library.Helper.EmojiconTextView;
@@ -23,13 +24,12 @@ import hani.momanii.supernova_emoji_library.Helper.EmojiconTextView;
 
 public class ContactAdapter extends AbstractItem<ContactAdapter, ContactAdapter.ViewHolder> implements Parcelable {
 
-    byte[] image;
+    String image;
     String name, status;
     Context context;
 
 
-
-    public ContactAdapter(byte[] image, String name, String status,Context context) {
+    public ContactAdapter(String image, String name, String status, Context context) {
         this.image = image;
         this.name = name;
         this.status = status;
@@ -44,11 +44,11 @@ public class ContactAdapter extends AbstractItem<ContactAdapter, ContactAdapter.
         this.context = context;
     }
 
-    public byte[] getImage() {
+    public String getImage() {
         return image;
     }
 
-    public void setImage(byte[] image) {
+    public void setImage(String image) {
         this.image = image;
     }
 
@@ -84,10 +84,10 @@ public class ContactAdapter extends AbstractItem<ContactAdapter, ContactAdapter.
 
 
         Glide.with(context)
-                .load(image)
+                .load(new File(image))
                 .into(holder.contact_image);
 
-       // holder.contact_image.setImageDrawable(image);
+        // holder.contact_image.setImageDrawable(image);
         //holder.isOnline.setVisibility(View.GONE);
 
         if (status.length() > 20)
@@ -123,13 +123,13 @@ public class ContactAdapter extends AbstractItem<ContactAdapter, ContactAdapter.
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeByteArray(this.image);
+        dest.writeString(this.image);
         dest.writeString(this.name);
         dest.writeString(this.status);
     }
 
     protected ContactAdapter(Parcel in) {
-        this.image = in.createByteArray();
+        this.image = in.readString();
         this.name = in.readString();
         this.status = in.readString();
     }
