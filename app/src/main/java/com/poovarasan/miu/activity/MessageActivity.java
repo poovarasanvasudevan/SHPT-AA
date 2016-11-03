@@ -13,6 +13,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
@@ -35,6 +36,8 @@ public class MessageActivity extends AppCompatActivity {
 
     ActivityMessageBinding activityMessageBinding;
     ContactAdapter contactAdapter;
+    int sendType = 0;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +63,7 @@ public class MessageActivity extends AppCompatActivity {
                 finish();
             }
         });
+
 
         mikeModification(0);
 
@@ -117,11 +121,27 @@ public class MessageActivity extends AppCompatActivity {
                 ActivityCompat.startActivity(MessageActivity.this, intent1, null);
             }
         });
+
+        activityMessageBinding.rippleSendBtn.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+
+                return false;
+            }
+        });
+
+
+    }
+
+
+    public static int dp(float value) {
+        return (int) Math.ceil(1 * value);
     }
 
     void mikeModification(int count) {
         if (count > 0) {
             activityMessageBinding.sendBtn.setImageResource(R.drawable.ic_action_send_now);
+            sendType = 1;
         } else {
             activityMessageBinding.sendBtn.setImageResource(R.drawable.ic_mic);
         }

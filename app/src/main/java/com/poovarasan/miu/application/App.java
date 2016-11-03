@@ -127,6 +127,8 @@ public class App extends Application {
                 storage.createDirectory("Miu");
                 storage.createDirectory("Miu/Images/ProfilePic");
                 storage.createDirectory("Miu/Messages/Media");
+                storage.createDirectory("Miu/Messages/Media/Audio");
+                storage.createDirectory("Miu/Messages/Media/Image");
                 storage.createDirectory("Miu/Backup");
 
 
@@ -136,6 +138,8 @@ public class App extends Application {
                 storage.createDirectory("Miu");
                 storage.createDirectory("Miu/Images/ProfilePic");
                 storage.createDirectory("Miu/Messages/Media");
+                storage.createDirectory("Miu/Messages/Media/Audio");
+                storage.createDirectory("Miu/Messages/Media/Image");
                 storage.createDirectory("Miu/Backup");
 
             }
