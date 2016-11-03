@@ -19,6 +19,7 @@ import com.poovarasan.miu.service.RedisService;
 import com.sromku.simple.storage.SimpleStorage;
 import com.sromku.simple.storage.Storage;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Random;
 
@@ -149,7 +150,9 @@ public class App extends Application {
     }
 
     public static Bitmap byteToBitmap(byte[] bytes) {
-        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+        ByteArrayInputStream arrayInputStream = new ByteArrayInputStream(bytes);
+        Bitmap bitmap = BitmapFactory.decodeStream(arrayInputStream);
+        return bitmap;
     }
 
 

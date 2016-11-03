@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
+import android.util.Log;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -75,7 +76,8 @@ public class Sync {
                                 users.put("NUMBER", parseUser.getUsername());
                                 users.put("STATUS", parseUser.get("status"));
 
-                                if (parseUser.get("image") == null) {
+                                App.getStorage(context).getFile("Miu/Images/ProfilePic", parseUser.getUsername() + ".png").deleteOnExit();
+                                if (parseUser.getBytes("image") == null) {
                                     App
                                             .getStorage(context)
                                             .createFile("Miu/Images/ProfilePic", parseUser.getUsername() + ".png", App.byteToBitmap(App.getDefaultImage(context)));
@@ -84,6 +86,7 @@ public class Sync {
                                     users.put("IMAGE", profilePic.getAbsolutePath());
                                 } else {
 
+                                    Log.i("ImageChage", parseUser.getUsername());
                                     App
                                             .getStorage(context)
                                             .createFile("Miu/Images/ProfilePic", parseUser.getUsername() + ".png", App.byteToBitmap(parseUser.getBytes("image")));

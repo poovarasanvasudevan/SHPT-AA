@@ -118,7 +118,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_above="@+id/bottomMessageBar" />
-            
+
             <android.support.v7.widget.CardView
                 android:id="@+id/bottomMessageBar"
                 android:layout_width="match_parent"
@@ -129,7 +129,6 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-
                     android:padding="4dp">
 
                     <LinearLayout
