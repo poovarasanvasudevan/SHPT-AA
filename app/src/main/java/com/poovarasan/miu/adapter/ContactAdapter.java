@@ -29,7 +29,8 @@ public class ContactAdapter extends AbstractItem<ContactAdapter, ContactAdapter.
     Context context;
 
 
-    public ContactAdapter(String image, String name, String status, Context context) {
+
+    public ContactAdapter(String image, String name, String status,Context context) {
         this.image = image;
         this.name = name;
         this.status = status;
@@ -87,7 +88,7 @@ public class ContactAdapter extends AbstractItem<ContactAdapter, ContactAdapter.
                 .load(new File(image))
                 .into(holder.contact_image);
 
-        // holder.contact_image.setImageDrawable(image);
+       // holder.contact_image.setImageDrawable(image);
         //holder.isOnline.setVisibility(View.GONE);
 
         if (status.length() > 20)

@@ -77,6 +77,7 @@ public class Sync {
                                 users.put("STATUS", parseUser.get("status"));
 
                                 App.getStorage(context).getFile("Miu/Images/ProfilePic", parseUser.getUsername() + ".png").deleteOnExit();
+
                                 if (parseUser.getBytes("image") == null) {
                                     App
                                             .getStorage(context)
@@ -94,7 +95,6 @@ public class Sync {
                                     File profilePic = App.getStorage(context).getFile("Miu/Images/ProfilePic", parseUser.getUsername() + ".png");
                                     users.put("IMAGE", profilePic.getAbsolutePath());
                                 }
-
 
                                 users.put("NAME", getContactName(context, parseUser.getUsername()));
                                 users.pinInBackground();
