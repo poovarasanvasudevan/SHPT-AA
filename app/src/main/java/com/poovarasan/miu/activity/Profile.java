@@ -2,6 +2,7 @@ package com.poovarasan.miu.activity;
 
 import android.Manifest;
 import android.content.ComponentName;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
@@ -16,6 +17,7 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bumptech.glide.Glide;
+import com.cocosw.bottomsheet.BottomSheet;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
@@ -202,6 +204,7 @@ public class Profile extends AppCompatActivity {
         if (item.getItemId() == android.R.id.home) {
             finish();
         }
+
         return super.onOptionsItemSelected(item);
     }
 

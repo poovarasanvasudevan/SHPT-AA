@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/messageProfile"
+        android:icon="@drawable/ic_message_black"
+        android:title="Message" />
+
+    <item
+        android:id="@+id/callProfile"
+        android:icon="@drawable/ic_call_black"
+        android:title="Call" />
+
+
+    <item
+        android:id="@+id/videoProfile"
+        android:icon="@drawable/ic_video_call"
+        android:title="Video Call" />
+</menu>

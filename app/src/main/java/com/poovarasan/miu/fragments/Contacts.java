@@ -71,6 +71,7 @@ public class Contacts extends Fragment {
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         fragmentContactsBinding.allcontacts.setLayoutManager(llm);
+        Nammu.init(getActivity());
 
         int permissionCheck = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_CONTACTS);
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
@@ -80,7 +81,7 @@ public class Contacts extends Fragment {
                 @Override
                 public void permissionGranted() {
 
-                    new RefreshUser().execute();
+                    AsyncTaskCompat.executeParallel(new RefreshUser(), null);
                 }
 
                 @Override
@@ -97,7 +98,7 @@ public class Contacts extends Fragment {
                     @Override
                     public void permissionGranted() {
 
-                        new RefreshUser().execute();
+                        AsyncTaskCompat.executeParallel(new RefreshUser(), null);
                     }
 
                     @Override
@@ -236,7 +237,7 @@ public class Contacts extends Fragment {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+       // super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         Nammu.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 

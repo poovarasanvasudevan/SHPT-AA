@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Random;
 
+import pl.tajchert.nammu.Nammu;
 import redis.clients.jedis.Jedis;
 
 /**
@@ -52,6 +53,8 @@ public class App extends Application {
                 .saveInBackground();
 
         resources = getResources();
+
+        Nammu.init(this);
 //        EasyImage.configuration(this)
 //                .setImagesFolderName("MiuImages")
 //                .saveInAppExternalFilesDir()

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/imageAttachement"
+        android:icon="@drawable/ic_photo"
+        android:title="Image" />
+    <item
+        android:id="@+id/cameraAttachement"
+        android:icon="@drawable/ic_camera_alt"
+        android:title="Camera" />
+    <item
+        android:id="@+id/audio"
+        android:icon="@drawable/ic_music"
+        android:title="Audio" />
+
+    <item
+        android:id="@+id/videoAttachement"
+        android:icon="@drawable/ic_videocam"
+        android:title="Video" />
+
+    <item
+        android:id="@+id/documentAttachement"
+        android:icon="@drawable/ic_document"
+        android:title="Documents" />
+
+
+    <item
+        android:id="@+id/voice"
+        android:icon="@drawable/ic_mic_black"
+        android:title="Voice" />
+
+</menu>

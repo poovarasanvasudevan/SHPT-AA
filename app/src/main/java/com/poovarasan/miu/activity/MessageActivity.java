@@ -1,6 +1,7 @@
 package com.poovarasan.miu.activity;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
@@ -20,6 +21,7 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bumptech.glide.Glide;
+import com.cocosw.bottomsheet.BottomSheet;
 import com.poovarasan.miu.R;
 import com.poovarasan.miu.adapter.ContactAdapter;
 import com.poovarasan.miu.databinding.ActivityMessageBinding;
@@ -37,6 +39,8 @@ public class MessageActivity extends AppCompatActivity {
     ActivityMessageBinding activityMessageBinding;
     ContactAdapter contactAdapter;
     int sendType = 0;
+    MaterialDialog materialDialog;
+    MaterialDialog.Builder builder;
 
 
     @Override
@@ -247,6 +251,24 @@ public class MessageActivity extends AppCompatActivity {
                             }
                         })
                         .show();
+                break;
+            }
+
+
+            case R.id.attach_file: {
+
+                new BottomSheet.Builder(this)
+                        .title("Choose Attachement Type")
+                        .sheet(R.menu.attachement_sheet)
+                        .grid()
+                        .listener(new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                switch (which) {
+
+                                }
+                            }
+                        }).show();
                 break;
             }
         }

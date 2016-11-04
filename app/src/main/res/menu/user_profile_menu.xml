@@ -4,6 +4,13 @@
 
     <item
         android:title="Share"
+        android:id="@+id/profileMessage"
+        android:icon="@drawable/ic_message"
+        app:showAsAction="always" />
+
+
+    <item
+        android:title="Share"
         app:showAsAction="never" />
     <item
         android:title="Edit"

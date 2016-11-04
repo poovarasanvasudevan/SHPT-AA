@@ -10,6 +10,7 @@
     <item
         android:icon="@drawable/ic_attach_file"
         android:title="Call"
+        android:id="@+id/attach_file"
         app:showAsAction="always" />
 
     <item
