@@ -148,6 +148,7 @@ public class Contacts extends Fragment {
                             parseObject.getString("IMAGE"),
                             parseObject.getString("NAME"),
                             parseObject.getString("STATUS"),
+                            parseObject.getString("NUMBER"),
                             getActivity().getApplicationContext()
                     ));
                 }
@@ -237,7 +238,7 @@ public class Contacts extends Fragment {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-       // super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        // super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         Nammu.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 

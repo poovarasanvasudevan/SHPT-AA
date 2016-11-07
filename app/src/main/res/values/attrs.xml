@@ -8,6 +8,8 @@
     </declare-styleable>
     <item name="contact_adapter" type="id"></item>
     <item name="menu_adapter" type="id"></item>
+    <item name="message_other_adapter" type="id"></item>
+    <item name="message_self_adapter" type="id"></item>
     <!-- TabIndicator Attribute -->
     <declare-styleable name="TabIndicator">
         <attr name="tab_text_size" format="dimension"/>

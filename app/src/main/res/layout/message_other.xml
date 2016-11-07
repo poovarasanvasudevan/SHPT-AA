@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="8dp"
+    android:layout_marginRight="60dp"
+    android:layout_marginTop="@dimen/message_bubble_margin_top">
+
+    <FrameLayout
+        android:id="@+id/message_scout_text_image_view_avatar_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="16dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/shape_oval_navy">
+
+
+    </FrameLayout>
+
+    <ImageView
+        android:id="@+id/message_scout_text_image_view_carrot"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_toLeftOf="@+id/message_scout_text_view_group_bubble"
+        android:layout_alignTop="@+id/message_scout_text_view_group_bubble"
+        android:layout_marginRight="-4dp"
+        android:scaleType="fitCenter"
+        android:adjustViewBounds="true"
+        android:src="@drawable/vd_ic_scout_carrot"
+        android:tint="?colorPrimary"/>
+
+    <FrameLayout
+        android:id="@+id/message_scout_text_view_group_bubble"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/message_scout_text_image_view_avatar_group"
+        android:background="@drawable/shape_rounded_rectangle_primary"
+        android:padding="10dp">
+
+        <hani.momanii.supernova_emoji_library.Helper.EmojiconTextView
+            android:id="@+id/message_scout_text_text_view_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:autoLink="web"
+            android:gravity="left"
+            android:textColor="@color/text_white"
+            android:textSize="13sp"
+            tools:text="You can get pizza at Zio's."/>
+    </FrameLayout>
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/message_scout_text_text_view_timestamp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/message_scout_text_view_group_bubble"
+        android:layout_below="@+id/message_scout_text_view_group_bubble"
+        android:layout_marginBottom="@dimen/message_timestamp_margin_bottom"
+        android:layout_marginTop="@dimen/message_timestamp_margin_top"
+        android:gravity="left"
+        android:singleLine="true"
+        android:textColor="@color/text_gray_darkest"
+        android:textSize="10sp"
+        tools:text="12:29pm" />
+</RelativeLayout>

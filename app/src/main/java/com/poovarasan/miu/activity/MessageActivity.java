@@ -5,11 +5,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.os.AsyncTaskCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
@@ -22,17 +25,38 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bumptech.glide.Glide;
 import com.cocosw.bottomsheet.BottomSheet;
+import com.mikepenz.fastadapter.IItem;
+import com.mikepenz.fastadapter.adapters.FastItemAdapter;
+import com.mikepenz.fastadapter.adapters.HeaderAdapter;
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
 import com.poovarasan.miu.R;
 import com.poovarasan.miu.adapter.ContactAdapter;
+import com.poovarasan.miu.adapter.MessageOtherAdapter;
+import com.poovarasan.miu.adapter.MessageSelfAdapter;
+import com.poovarasan.miu.application.App;
 import com.poovarasan.miu.databinding.ActivityMessageBinding;
+import com.poovarasan.miu.event.TextMessageEvent;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
+import java.util.Date;
+import java.util.List;
 
 import hani.momanii.supernova_emoji_library.Actions.EmojIconActions;
 import pl.aprilapps.easyphotopicker.DefaultCallback;
 import pl.aprilapps.easyphotopicker.EasyImage;
 import pl.tajchert.nammu.Nammu;
 import pl.tajchert.nammu.PermissionCallback;
+import redis.clients.jedis.Jedis;
 
 public class MessageActivity extends AppCompatActivity {
 
@@ -42,6 +66,11 @@ public class MessageActivity extends AppCompatActivity {
     MaterialDialog materialDialog;
     MaterialDialog.Builder builder;
 
+    HeaderAdapter<MessageSelfAdapter> selfFastAdapter;
+    FastItemAdapter<IItem> otherFastAdapter;
+
+
+    Jedis jedis;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +98,7 @@ public class MessageActivity extends AppCompatActivity {
         });
 
 
+        Jedis jedis = App.getRedis();
         mikeModification(0);
 
 
@@ -89,8 +119,13 @@ public class MessageActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable editable) {
-
                 mikeModification(editable.length());
+            }
+        });
+        activityMessageBinding.messageText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                activityMessageBinding.userMessage.smoothScrollToPosition(otherFastAdapter.getItemCount());
             }
         });
 
@@ -130,11 +165,100 @@ public class MessageActivity extends AppCompatActivity {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
 
+                if (sendType == 1) {
+
+                    JSONObject jsonObject = new JSONObject();
+
+                    try {
+                        jsonObject.put("type", "MESSAGE");
+                        //{'type':'MESSAGE','from':'9789197654','MESSAGETYPE':'TEXT','message':'Hello Poosan'}
+                        jsonObject.put("from", ParseUser.getCurrentUser().getUsername());
+                        jsonObject.put("MESSAGETYPE", "TEXT");
+                        jsonObject.put("time", new Date().getTime());
+                        jsonObject.put("message", activityMessageBinding.messageText.getText().toString());
+
+                        AsyncTaskCompat.executeParallel(new SendMessageTask(), jsonObject);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+
+                } else {
+
+                }
                 return false;
             }
         });
 
+        selfFastAdapter = new HeaderAdapter<>();
+        otherFastAdapter = new FastItemAdapter<>();
 
+        LinearLayoutManager llm = new LinearLayoutManager(this);
+        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        activityMessageBinding.userMessage.setLayoutManager(llm);
+
+        activityMessageBinding.userMessage.setAdapter(selfFastAdapter.wrap(otherFastAdapter));
+
+        ParseQuery query = ParseQuery.getQuery("MESSAGE");
+        query.fromLocalDatastore();
+        query.whereEqualTo("from", contactAdapter.getNumber());
+
+
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                for (ParseObject parseObject : objects) {
+                    if (parseObject.getBoolean("isself") == false) {
+                        otherFastAdapter.add(new MessageOtherAdapter(
+                                parseObject.getString("message"),
+                                parseObject.getLong("time")
+                        ));
+                    } else {
+                        otherFastAdapter.add(new MessageSelfAdapter(
+                                parseObject.getString("message"),
+                                parseObject.getLong("time")
+                        ));
+                    }
+                }
+
+                activityMessageBinding.userMessage.smoothScrollToPosition(otherFastAdapter.getItemCount());
+            }
+        });
+
+
+    }
+
+    class SendMessageTask extends AsyncTask<JSONObject, Void, JSONObject> {
+        @Override
+        protected JSONObject doInBackground(JSONObject... jsonObjects) {
+            long result = App.getRedis().publish(contactAdapter.getNumber(), jsonObjects[0].toString());
+            JSONObject jsonObject = jsonObjects[0];
+
+            ParseObject parseObject = new ParseObject("MESSAGE");
+            parseObject.put("from", contactAdapter.getNumber());
+            parseObject.put("time", jsonObject.optLong("time"));
+            parseObject.put("messagetype", "TEXT");
+            parseObject.put("isself", true);
+            parseObject.put("message", jsonObject.optString("message"));
+            parseObject.pinInBackground();
+            if (result < 1) {
+                App.getRedis().lpush(contactAdapter.getNumber() + ".messagequque", jsonObjects[0].toString());
+            }
+            return jsonObjects[0];
+        }
+
+        @Override
+        protected void onPostExecute(JSONObject aBoolean) {
+
+            otherFastAdapter.add(new MessageSelfAdapter(
+                    aBoolean.optString("message"),
+                    aBoolean.optLong("time")
+            ));
+
+            activityMessageBinding.messageText.setText("");
+            activityMessageBinding.userMessage.smoothScrollToPosition(otherFastAdapter.getItemCount());
+            super.onPostExecute(aBoolean);
+        }
     }
 
 
@@ -148,6 +272,7 @@ public class MessageActivity extends AppCompatActivity {
             sendType = 1;
         } else {
             activityMessageBinding.sendBtn.setImageResource(R.drawable.ic_mic);
+            sendType = 0;
         }
     }
 
@@ -226,6 +351,22 @@ public class MessageActivity extends AppCompatActivity {
                         .positiveText(R.string.yes_button)
                         .negativeText(R.string.no_button)
                         .checkBoxPromptRes(R.string.clear_string, false, null)
+                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                ParseQuery query = ParseQuery.getQuery("MESSAGE");
+                                query.fromLocalDatastore();
+                                query.whereEqualTo("from", contactAdapter.getNumber());
+                                query.findInBackground(new FindCallback<ParseObject>() {
+                                    @Override
+                                    public void done(List<ParseObject> objects, ParseException e) {
+                                        ParseObject.unpinAllInBackground(objects);
+
+                                        otherFastAdapter.clear();
+                                    }
+                                });
+                            }
+                        })
                         .show();
 
                 break;
@@ -274,5 +415,29 @@ public class MessageActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(TextMessageEvent event) {
+
+        if (event.getNumber().equals(contactAdapter.getNumber())) {
+            otherFastAdapter.add(new MessageOtherAdapter(
+                    event.getMessage(),
+                    event.getTime()
+            ));
+            activityMessageBinding.userMessage.smoothScrollToPosition(otherFastAdapter.getItemCount());
+        }
     }
 }

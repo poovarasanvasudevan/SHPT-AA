@@ -26,14 +26,23 @@ public class ContactAdapter extends AbstractItem<ContactAdapter, ContactAdapter.
 
     String image;
     String name, status;
+    String number;
     Context context;
 
 
+    public String getNumber() {
+        return number;
+    }
 
-    public ContactAdapter(String image, String name, String status,Context context) {
+    public void setNumber(String number) {
+        this.number = number;
+    }
+
+    public ContactAdapter(String image, String name, String status, String number, Context context) {
         this.image = image;
         this.name = name;
         this.status = status;
+        this.number = number;
         this.context = context;
     }
 
@@ -127,12 +136,14 @@ public class ContactAdapter extends AbstractItem<ContactAdapter, ContactAdapter.
         dest.writeString(this.image);
         dest.writeString(this.name);
         dest.writeString(this.status);
+        dest.writeString(this.number);
     }
 
     protected ContactAdapter(Parcel in) {
         this.image = in.readString();
         this.name = in.readString();
         this.status = in.readString();
+        this.number = in.readString();
     }
 
     public static final Parcelable.Creator<ContactAdapter> CREATOR = new Parcelable.Creator<ContactAdapter>() {

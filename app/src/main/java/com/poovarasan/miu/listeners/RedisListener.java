@@ -4,20 +4,30 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
 import android.os.AsyncTask;
 import android.os.PowerManager;
 import android.support.v4.os.AsyncTaskCompat;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 
+import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.poovarasan.miu.R;
 import com.poovarasan.miu.activity.MessageActivity;
 import com.poovarasan.miu.application.App;
+import com.poovarasan.miu.event.TextMessageEvent;
+import com.sromku.simple.storage.Storage;
 
+import org.greenrobot.eventbus.EventBus;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Date;
 import java.util.List;
 
 import br.com.goncalves.pugnotification.notification.PugNotification;
@@ -45,7 +55,77 @@ public class RedisListener extends JedisPubSub {
     public void onMessage(String channel, String message) {
         Log.i(channel, message);
         notifyMe(message, context);
+        parseMessage(message);
         // showDialog(message);
+    }
+
+    private void parseMessage(String message) {
+        try {
+            JSONObject jsonObject = new JSONObject(message);
+            String type = jsonObject.optString("type");
+            switch (type) {
+
+                case "MESSAGE": {
+                    String from = jsonObject.optString("from");
+                    long time = new Date().getTime();
+                    String messageType = jsonObject.optString("MESSAGETYPE");
+                    switch (messageType) {
+                        case "TEXT": {
+                            ParseObject parseObject = new ParseObject("MESSAGE");
+                            parseObject.put("from", from);
+                            parseObject.put("time", time);
+                            parseObject.put("isself", false);
+                            parseObject.put("messagetype", messageType);
+                            parseObject.put("message", jsonObject.optString("message"));
+                            parseObject.pinInBackground();
+
+
+                            EventBus.getDefault().post(new TextMessageEvent(
+                                    jsonObject.optString("message"),
+                                    from,
+                                    time
+                            ));
+
+                            break;
+                        }
+                        case "IMAGE": {
+                            String imageBytes = jsonObject.optString("image");
+                            byte[] encodedImage = Base64.decode(imageBytes, Base64.DEFAULT);
+                            Bitmap bitmap = App.byteToBitmap(encodedImage);
+                            Storage storage = App.getStorage(context);
+
+                            storage.createDirectory("Miu/Messages/Media/" + from);
+
+                            String PATH = "Miu/Messages/Media/" + from;
+                            String NAME = "MEDIA" + new Date().getTime() + ".png";
+
+                            storage.createFile(PATH, NAME, bitmap);
+                            String filePath = App.getStorage(context).getFile(PATH, NAME).getAbsolutePath();
+
+                            ParseObject parseObject = new ParseObject("MESSAGE");
+                            parseObject.put("from", from);
+                            parseObject.put("time", time);
+                            parseObject.put("isself", false);
+                            parseObject.put("messagetype", messageType);
+                            parseObject.put("imagepath", filePath);
+                            parseObject.pinInBackground();
+                            break;
+                        }
+                        case "VIDEO": {
+
+                        }
+                        case "LOCATION": {
+
+                        }
+                    }
+                    break;
+                }
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override

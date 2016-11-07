@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="60dp"
+    android:layout_marginRight="8dp"
+    android:layout_marginTop="@dimen/message_bubble_margin_top">
+
+    <FrameLayout
+        android:id="@+id/message_user_text_view_group_avatar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="16dp"
+        android:background="@drawable/shape_oval_navy"></FrameLayout>
+
+    <ImageView
+        android:id="@+id/message_user_text_image_view_carrot"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_alignTop="@+id/message_user_text_view_group_bubble"
+        android:layout_marginLeft="-4dp"
+        android:layout_toRightOf="@+id/message_user_text_view_group_bubble"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"
+        android:src="@drawable/vd_ic_user_carrot"
+        android:tint="@color/background_white" />
+
+    <FrameLayout
+        android:id="@+id/message_user_text_view_group_bubble"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@+id/message_user_text_view_group_avatar"
+        android:background="@drawable/shape_rounded_rectangle_white"
+        android:padding="16dp">
+
+        <hani.momanii.supernova_emoji_library.Helper.EmojiconTextView
+            android:id="@+id/message_user_text_text_view_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:autoLink="web"
+            android:gravity="left"
+            android:textColor="@color/text_navy"
+            android:textSize="14sp"
+            tools:text="In need of pizza. Can you help?" />
+    </FrameLayout>
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/message_user_text_text_view_timestamp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/message_user_text_view_group_bubble"
+        android:layout_below="@+id/message_user_text_view_group_bubble"
+        android:layout_marginBottom="@dimen/message_timestamp_margin_bottom"
+        android:layout_marginTop="@dimen/message_timestamp_margin_top"
+        android:gravity="right"
+        android:singleLine="true"
+        android:textColor="@color/text_gray_darkest"
+        android:textSize="10sp"
+        tools:text="12:29pm" />
+</RelativeLayout>
