@@ -122,12 +122,7 @@ public class MessageActivity extends AppCompatActivity {
                 mikeModification(editable.length());
             }
         });
-        activityMessageBinding.messageText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean b) {
-                activityMessageBinding.userMessage.smoothScrollToPosition(otherFastAdapter.getItemCount());
-            }
-        });
+
 
         activityMessageBinding.cameraButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -192,9 +187,14 @@ public class MessageActivity extends AppCompatActivity {
 
         selfFastAdapter = new HeaderAdapter<>();
         otherFastAdapter = new FastItemAdapter<>();
+        otherFastAdapter.setHasStableIds(true);
+        otherFastAdapter.withSelectable(true);
+        otherFastAdapter.withMultiSelect(true);
+        otherFastAdapter.withSelectOnLongClick(true);
 
         LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
+        llm.setStackFromEnd(true);
         activityMessageBinding.userMessage.setLayoutManager(llm);
 
         activityMessageBinding.userMessage.setAdapter(selfFastAdapter.wrap(otherFastAdapter));
@@ -202,6 +202,7 @@ public class MessageActivity extends AppCompatActivity {
         ParseQuery query = ParseQuery.getQuery("MESSAGE");
         query.fromLocalDatastore();
         query.whereEqualTo("from", contactAdapter.getNumber());
+        query.orderByAscending("time");
 
 
         query.findInBackground(new FindCallback<ParseObject>() {
@@ -226,6 +227,12 @@ public class MessageActivity extends AppCompatActivity {
         });
 
 
+        activityMessageBinding.messageText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                activityMessageBinding.userMessage.smoothScrollToPosition(otherFastAdapter.getItemCount());
+            }
+        });
     }
 
     class SendMessageTask extends AsyncTask<JSONObject, Void, JSONObject> {

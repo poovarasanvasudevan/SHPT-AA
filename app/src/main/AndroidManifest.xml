@@ -99,7 +99,7 @@
         <activity
             android:name=".activity.MessageActivity"
             android:label=""
-            android:windowSoftInputMode="adjustPan|stateHidden" />
+            android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name=".activity.Profile"
             android:label="Profile"
