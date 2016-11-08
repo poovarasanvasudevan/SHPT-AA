@@ -1,6 +1,7 @@
 package com.poovarasan.miu.activity;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -33,6 +34,7 @@ import com.mikepenz.fastadapter.adapters.FastItemAdapter;
 import com.mikepenz.fastadapter.adapters.HeaderAdapter;
 import com.mikepenz.fastadapter_extensions.ActionModeHelper;
 import com.mikepenz.fastadapter_extensions.UndoHelper;
+import com.mikepenz.materialize.MaterializeBuilder;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -88,6 +90,7 @@ public class MessageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         activityMessageBinding = DataBindingUtil.setContentView(this, R.layout.activity_message);
 
+        new MaterializeBuilder().withActivity(this).build();
         // setTheme(R.style.GreenTheme);
         setSupportActionBar(activityMessageBinding.toolbar);
         pos = new ArrayList<>();
@@ -183,7 +186,7 @@ public class MessageActivity extends AppCompatActivity {
                         jsonObject.put("from", ParseUser.getCurrentUser().getUsername());
                         jsonObject.put("MESSAGETYPE", "TEXT");
                         jsonObject.put("time", new Date().getTime());
-                        jsonObject.put("message", activityMessageBinding.messageText.getText().toString());
+                        jsonObject.put("message", activityMessageBinding.messageText.getText().toString().trim());
 
                         AsyncTaskCompat.executeParallel(new SendMessageTask(), jsonObject);
                     } catch (JSONException e) {
@@ -227,20 +230,15 @@ public class MessageActivity extends AppCompatActivity {
                     pos.add(position);
                     findViewById(R.id.action_mode_bar).setBackgroundColor(getResources().getColor(R.color.colorPrimary));
 
+
+                } else {
+                    v.setBackgroundColor(getResources().getColor(R.color.transparent));
                 }
                 return actionMode != null;
 
             }
         });
 
-        undoHelper = new UndoHelper(otherFastAdapter, new UndoHelper.UndoListener<IItem>() {
-            @Override
-            public void commitRemove(Set<Integer> positions, ArrayList<FastAdapter.RelativeInfo<IItem>> removed) {
-                for (Integer pos : positions) {
-                    otherFastAdapter.notifyAdapterItemRemoved(pos);
-                }
-            }
-        });
         LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         llm.setStackFromEnd(true);
@@ -284,6 +282,17 @@ public class MessageActivity extends AppCompatActivity {
         });
     }
 
+    private void setClipboard(Context context, String text) {
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
+            android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            clipboard.setText(text);
+        } else {
+            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", text);
+            clipboard.setPrimaryClip(clip);
+        }
+    }
+
     private class ActionBarCallBack implements ActionMode.Callback {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -299,10 +308,9 @@ public class MessageActivity extends AppCompatActivity {
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 
             if (item.getItemId() == R.id.msgDelete) {
-                Set<IItem> selectedItems = otherFastAdapter.getSelectedItems();
 
                 for (final Integer integer : otherFastAdapter.getSelections()) {
-                   // ;
+                    // ;
                     ParseQuery query = ParseQuery.getQuery("MESSAGE");
                     query.fromLocalDatastore();
                     query.whereEqualTo("uniqid", (String) otherFastAdapter.getItem(integer).getTag());
@@ -320,7 +328,30 @@ public class MessageActivity extends AppCompatActivity {
                 }
 
 
-                Toast.makeText(getApplicationContext(), otherFastAdapter.getSelections().size() + " Message Deleted", Toast.LENGTH_LONG).show();
+                Toast
+                        .makeText(getApplicationContext(), otherFastAdapter.getSelections().size() + " Message Deleted", Toast.LENGTH_LONG)
+                        .show();
+            }
+
+            if (item.getItemId() == R.id.msgCopy) {
+                Set<IItem> items = otherFastAdapter.getSelectedItems();
+
+                String clipboard = "";
+                for (IItem iItem : items) {
+                    if (iItem instanceof MessageSelfAdapter) {
+                        MessageSelfAdapter messageSelfAdapter1 = (MessageSelfAdapter) iItem;
+                        clipboard += "\n" + messageSelfAdapter1.getMessage();
+                    } else if (iItem instanceof MessageOtherAdapter) {
+                        MessageOtherAdapter messageSelfAdapter2 = (MessageOtherAdapter) iItem;
+                        clipboard += "\n" + messageSelfAdapter2.getMessage();
+                    }
+                }
+
+                setClipboard(getApplicationContext(), clipboard);
+
+                Toast
+                        .makeText(getApplicationContext(), "Message Copied Succesfully..", Toast.LENGTH_LONG)
+                        .show();
             }
             mode.finish();
             return true;

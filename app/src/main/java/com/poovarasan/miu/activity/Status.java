@@ -8,6 +8,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.mikepenz.materialize.MaterializeBuilder;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.poovarasan.miu.R;
@@ -29,6 +30,7 @@ public class Status extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         activityStatusBinding = DataBindingUtil.setContentView(this, R.layout.activity_status);
 
+        new MaterializeBuilder().withActivity(this).build();
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 

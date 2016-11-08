@@ -7,6 +7,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.mikepenz.materialize.MaterializeBuilder;
 import com.poovarasan.miu.R;
 import com.poovarasan.miu.databinding.ActivityBackupBinding;
 
@@ -19,6 +20,7 @@ public class BackupActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activityBackupBinding = DataBindingUtil.setContentView(this, R.layout.activity_backup);
+        new MaterializeBuilder().withActivity(this).build();
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

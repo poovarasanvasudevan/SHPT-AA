@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.mikepenz.materialize.MaterializeBuilder;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
@@ -35,6 +36,7 @@ public class Login extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         final ActivityLoginBinding activityLoginBinding = DataBindingUtil.setContentView(this, R.layout.activity_login);
 
+        new MaterializeBuilder().withActivity(this).build();
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 

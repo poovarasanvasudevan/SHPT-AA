@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.mikepenz.materialize.MaterializeBuilder;
 import com.poovarasan.miu.R;
 import com.poovarasan.miu.databinding.ActivityDataUsageBinding;
 
@@ -28,6 +29,7 @@ public class DataUsage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         activityDataUsageBinding = DataBindingUtil.setContentView(this, R.layout.activity_data_usage);
 
+        new MaterializeBuilder().withActivity(this).build();
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

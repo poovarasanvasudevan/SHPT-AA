@@ -14,6 +14,7 @@ import android.view.View;
 
 import com.bumptech.glide.Glide;
 import com.mikepenz.fastadapter.adapters.FastItemAdapter;
+import com.mikepenz.materialize.MaterializeBuilder;
 import com.parse.ParseUser;
 import com.poovarasan.miu.R;
 import com.poovarasan.miu.adapter.SettingMenuAdapter;
@@ -38,6 +39,7 @@ public class Settings extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         activitySettingsBinding = DataBindingUtil.setContentView(this, R.layout.activity_settings);
 
+        new MaterializeBuilder().withActivity(this).build();
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

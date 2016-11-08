@@ -2,7 +2,6 @@ package com.poovarasan.miu.activity;
 
 import android.Manifest;
 import android.content.ComponentName;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
@@ -17,7 +16,7 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bumptech.glide.Glide;
-import com.cocosw.bottomsheet.BottomSheet;
+import com.mikepenz.materialize.MaterializeBuilder;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
@@ -52,6 +51,7 @@ public class Profile extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         activityProfileBinding = DataBindingUtil.setContentView(this, R.layout.activity_profile);
 
+        new MaterializeBuilder().withActivity(this).build();
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

@@ -32,6 +32,7 @@ public class UserProfile extends AppCompatActivity {
         activityUserProfileBinding = DataBindingUtil.setContentView(this, R.layout.activity_user_profile);
 
 
+
         setSupportActionBar(activityUserProfileBinding.MyToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 

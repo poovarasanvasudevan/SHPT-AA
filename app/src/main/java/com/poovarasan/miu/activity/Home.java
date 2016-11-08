@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.mikepenz.materialize.MaterializeBuilder;
 import com.poovarasan.miu.R;
 import com.poovarasan.miu.adapter.PagerAdapter;
 import com.poovarasan.miu.application.App;
@@ -46,6 +47,7 @@ public class Home extends AppCompatActivity implements TabLayout.OnTabSelectedLi
         super.onCreate(savedInstanceState);
         activityHomeBinding = DataBindingUtil.setContentView(this, R.layout.activity_home);
 
+        new MaterializeBuilder().withActivity(this).build();
         setSupportActionBar(activityHomeBinding.toolbar);
 
 

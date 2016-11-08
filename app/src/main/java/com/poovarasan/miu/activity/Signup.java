@@ -8,6 +8,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Toast;
 
+import com.mikepenz.materialize.MaterializeBuilder;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
@@ -23,6 +24,7 @@ public class Signup extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         final ActivitySignupBinding activitySignupBinding = DataBindingUtil.setContentView(this, R.layout.activity_signup);
 
+        new MaterializeBuilder().withActivity(this).build();
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
