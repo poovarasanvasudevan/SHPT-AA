@@ -77,6 +77,7 @@ public class MessageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         activityMessageBinding = DataBindingUtil.setContentView(this, R.layout.activity_message);
 
+       // setTheme(R.style.GreenTheme);
         setSupportActionBar(activityMessageBinding.toolbar);
 
         final Intent intent = getIntent();
@@ -96,6 +97,7 @@ public class MessageActivity extends AppCompatActivity {
                 finish();
             }
         });
+
 
 
         Jedis jedis = App.getRedis();

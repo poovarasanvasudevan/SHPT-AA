@@ -21,6 +21,7 @@ import com.sromku.simple.storage.Storage;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.util.Random;
 
 import pl.tajchert.nammu.Nammu;
@@ -120,6 +121,18 @@ public class App extends Application {
         byte[] bitmapdata = stream.toByteArray();
 
         return bitmapdata;
+    }
+
+    public static String getDefaultImagePath(Context context) {
+        Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.default_image);
+
+
+        App.getStorage(context).getFile("Miu/Images/ProfilePic", "default.png").deleteOnExit();
+        App.getStorage(context)
+                .createFile("Miu/Images/ProfilePic", "default.png", bitmap);
+
+        File profilePic = App.getStorage(context).getFile("Miu/Images/ProfilePic", "default.png");
+        return profilePic.getAbsolutePath();
     }
 
     public static Storage getStorage(Context context) {

@@ -14,11 +14,15 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.Toast;
 
+import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.poovarasan.miu.R;
 import com.poovarasan.miu.activity.MessageActivity;
+import com.poovarasan.miu.adapter.ContactAdapter;
 import com.poovarasan.miu.application.App;
 import com.poovarasan.miu.event.TextMessageEvent;
 import com.sromku.simple.storage.Storage;
@@ -216,19 +220,77 @@ public class RedisListener extends JedisPubSub {
     }
 
     public void notifyMe(String message, Context context) {
-        Intent intent = new Intent(context, MessageActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        PugNotification.with(context)
-                .load()
-                .title("New Notification")
-                .message(message)
-                .smallIcon(R.drawable.ic_whatsapp)
-                .largeIcon(R.drawable.miublue)
-                .flags(Notification.DEFAULT_ALL)
-                .vibrate(new long[]{1000L, 200L, 300L})
-                .button(R.drawable.ic_reply, "reply", pendingIntent)
-                .simple()
-                .build();
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = new JSONObject(message);
+
+
+            ParseQuery parseQuery = ParseQuery.getQuery("MyUsers");
+            parseQuery.fromLocalDatastore();
+            parseQuery.whereEqualTo("NUMBER", jsonObject.optString("from"));
+            int parseObjectCount = parseQuery.count();
+
+
+            ParseQuery parseQuery1 = ParseQuery.getQuery("MyUsers");
+            parseQuery1.fromLocalDatastore();
+            parseQuery1.whereEqualTo("NUMBER", jsonObject.optString("from"));
+            ParseObject parseObject = parseQuery1.getFirst();
+            if (parseObjectCount > 0) {
+
+
+                Intent intent = new Intent(context, MessageActivity.class);
+                intent.putExtra("contactDetails", new ContactAdapter(
+                        parseObject.getString("IMAGE"),
+                        parseObject.getString("NAME"),
+                        parseObject.getString("STATUS"),
+                        parseObject.getString("NUMBER"),
+                        context
+                ));
+                PendingIntent pendingIntent = PendingIntent.getActivity(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                PugNotification.with(context)
+                        .load()
+                        .title(parseObject.getString("NUMBER") + " sent you a message...")
+                        .bigTextStyle(jsonObject.optString("message"))
+                        .smallIcon(R.drawable.ic_whatsapp)
+                        .largeIcon(R.drawable.miublue)
+                        .flags(Notification.DEFAULT_ALL)
+                        .vibrate(new long[]{1000L, 200L, 300L})
+                        .button(R.drawable.ic_reply, "reply", pendingIntent)
+                        .simple()
+                        .build();
+            } else {
+                Toast.makeText(context, "badcontacft", Toast.LENGTH_LONG).show();
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
+
+            if (e.getCode() == ParseException.OBJECT_NOT_FOUND) {
+
+                Intent intent = new Intent(context, MessageActivity.class);
+                intent.putExtra("contactDetails", new ContactAdapter(
+                        App.getDefaultImagePath(context),
+                        jsonObject.optString("from"),
+                        jsonObject.optString("from"),
+                        jsonObject.optString("from"),
+                        context
+                ));
+                PendingIntent pendingIntent = PendingIntent.getActivity(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                PugNotification.with(context)
+                        .load()
+                        .title(jsonObject.optString("from") + " sent you a message...")
+                        .bigTextStyle(jsonObject.optString("message"))
+                        .smallIcon(R.drawable.ic_whatsapp)
+                        .largeIcon(R.drawable.miublue)
+                        .flags(Notification.DEFAULT_ALL)
+                        .vibrate(new long[]{1000L, 200L, 300L})
+                        .button(R.drawable.ic_reply, "reply", pendingIntent)
+                        .simple()
+                        .build();
+            }
+        }
+
     }
 
     class GetMessage extends AsyncTask<Void, Void, Void> {
