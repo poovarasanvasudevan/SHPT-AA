@@ -12,6 +12,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.os.AsyncTaskCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -25,9 +26,13 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bumptech.glide.Glide;
 import com.cocosw.bottomsheet.BottomSheet;
+import com.mikepenz.fastadapter.FastAdapter;
+import com.mikepenz.fastadapter.IAdapter;
 import com.mikepenz.fastadapter.IItem;
 import com.mikepenz.fastadapter.adapters.FastItemAdapter;
 import com.mikepenz.fastadapter.adapters.HeaderAdapter;
+import com.mikepenz.fastadapter_extensions.ActionModeHelper;
+import com.mikepenz.fastadapter_extensions.UndoHelper;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -48,8 +53,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
 import hani.momanii.supernova_emoji_library.Actions.EmojIconActions;
 import pl.aprilapps.easyphotopicker.DefaultCallback;
@@ -71,14 +79,18 @@ public class MessageActivity extends AppCompatActivity {
 
 
     Jedis jedis;
+    private ActionModeHelper actionModeHelper;
+    List<Integer> pos;
+    private UndoHelper undoHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activityMessageBinding = DataBindingUtil.setContentView(this, R.layout.activity_message);
 
-       // setTheme(R.style.GreenTheme);
+        // setTheme(R.style.GreenTheme);
         setSupportActionBar(activityMessageBinding.toolbar);
+        pos = new ArrayList<>();
 
         final Intent intent = getIntent();
         contactAdapter = intent.getParcelableExtra("contactDetails");
@@ -97,7 +109,6 @@ public class MessageActivity extends AppCompatActivity {
                 finish();
             }
         });
-
 
 
         Jedis jedis = App.getRedis();
@@ -194,12 +205,48 @@ public class MessageActivity extends AppCompatActivity {
         otherFastAdapter.withMultiSelect(true);
         otherFastAdapter.withSelectOnLongClick(true);
 
+        // activityMessageBinding.toolbar.startActionMode((android.view.ActionMode.Callback) actionBarCallBack);
+
+
+        actionModeHelper = new ActionModeHelper(otherFastAdapter, R.menu.message_select, new ActionBarCallBack());
+        otherFastAdapter.withOnPreClickListener(new FastAdapter.OnClickListener<IItem>() {
+            @Override
+            public boolean onClick(View v, IAdapter<IItem> adapter, IItem item, int position) {
+                pos.add(position);
+                Boolean res = actionModeHelper.onClick(item);
+                return res != null ? res : false;
+            }
+        });
+
+        otherFastAdapter.withOnPreLongClickListener(new FastAdapter.OnLongClickListener<IItem>() {
+            @Override
+            public boolean onLongClick(View v, IAdapter<IItem> adapter, IItem item, int position) {
+                ActionMode actionMode = actionModeHelper.onLongClick(MessageActivity.this, position);
+                if (actionMode != null) {
+                    // Set CAB background color
+                    pos.add(position);
+                    findViewById(R.id.action_mode_bar).setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+
+                }
+                return actionMode != null;
+
+            }
+        });
+
+        undoHelper = new UndoHelper(otherFastAdapter, new UndoHelper.UndoListener<IItem>() {
+            @Override
+            public void commitRemove(Set<Integer> positions, ArrayList<FastAdapter.RelativeInfo<IItem>> removed) {
+                for (Integer pos : positions) {
+                    otherFastAdapter.notifyAdapterItemRemoved(pos);
+                }
+            }
+        });
         LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         llm.setStackFromEnd(true);
         activityMessageBinding.userMessage.setLayoutManager(llm);
 
-        activityMessageBinding.userMessage.setAdapter(selfFastAdapter.wrap(otherFastAdapter));
+        activityMessageBinding.userMessage.setAdapter(otherFastAdapter);
 
         ParseQuery query = ParseQuery.getQuery("MESSAGE");
         query.fromLocalDatastore();
@@ -215,12 +262,12 @@ public class MessageActivity extends AppCompatActivity {
                         otherFastAdapter.add(new MessageOtherAdapter(
                                 parseObject.getString("message"),
                                 parseObject.getLong("time")
-                        ));
+                        ).withTag(parseObject.getString("uniqid")));
                     } else {
                         otherFastAdapter.add(new MessageSelfAdapter(
                                 parseObject.getString("message"),
                                 parseObject.getLong("time")
-                        ));
+                        ).withTag(parseObject.getString("uniqid")));
                     }
                 }
 
@@ -237,6 +284,53 @@ public class MessageActivity extends AppCompatActivity {
         });
     }
 
+    private class ActionBarCallBack implements ActionMode.Callback {
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+
+            if (item.getItemId() == R.id.msgDelete) {
+                Set<IItem> selectedItems = otherFastAdapter.getSelectedItems();
+
+                for (final Integer integer : otherFastAdapter.getSelections()) {
+                   // ;
+                    ParseQuery query = ParseQuery.getQuery("MESSAGE");
+                    query.fromLocalDatastore();
+                    query.whereEqualTo("uniqid", (String) otherFastAdapter.getItem(integer).getTag());
+                    query.findInBackground(new FindCallback<ParseObject>() {
+
+                        @Override
+                        public void done(List<ParseObject> objects, ParseException e) {
+                            ParseObject.unpinAllInBackground(objects);
+                            otherFastAdapter.remove(integer);
+
+                        }
+                    });
+
+
+                }
+
+
+                Toast.makeText(getApplicationContext(), otherFastAdapter.getSelections().size() + " Message Deleted", Toast.LENGTH_LONG).show();
+            }
+            mode.finish();
+            return true;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+        }
+    }
+
     class SendMessageTask extends AsyncTask<JSONObject, Void, JSONObject> {
         @Override
         protected JSONObject doInBackground(JSONObject... jsonObjects) {
@@ -248,6 +342,7 @@ public class MessageActivity extends AppCompatActivity {
             parseObject.put("time", jsonObject.optLong("time"));
             parseObject.put("messagetype", "TEXT");
             parseObject.put("isself", true);
+            parseObject.put("uniqid", contactAdapter.getNumber() + "_" + new Random(999999999) + "_" + jsonObject.optLong("time"));
             parseObject.put("message", jsonObject.optString("message"));
             parseObject.pinInBackground();
             if (result < 1) {

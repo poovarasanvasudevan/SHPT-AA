@@ -33,6 +33,7 @@ import org.json.JSONObject;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 import br.com.goncalves.pugnotification.notification.PugNotification;
 import br.com.goncalves.pugnotification.notification.Simple;
@@ -79,6 +80,7 @@ public class RedisListener extends JedisPubSub {
                             parseObject.put("from", from);
                             parseObject.put("time", time);
                             parseObject.put("isself", false);
+                            parseObject.put("uniqid", from + "_" + new Random(999999999) + "_" + time);
                             parseObject.put("messagetype", messageType);
                             parseObject.put("message", jsonObject.optString("message"));
                             parseObject.pinInBackground();
@@ -110,6 +112,7 @@ public class RedisListener extends JedisPubSub {
                             parseObject.put("from", from);
                             parseObject.put("time", time);
                             parseObject.put("isself", false);
+                            parseObject.put("uniqid", from + "_" + new Random(999999999) + "_" + time);
                             parseObject.put("messagetype", messageType);
                             parseObject.put("imagepath", filePath);
                             parseObject.pinInBackground();
