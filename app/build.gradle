@@ -66,5 +66,7 @@ dependencies {
     compile 'org.greenrobot:eventbus:3.0.0'
     compile "com.mikepenz:materialize:1.0.0@aar"
     compile 'io.openwebrtc:openwebrtc-android-sdk:0.1.0'
+    compile 'com.meetic.marypopup:marypopup:1.0.0'
+    compile 'com.meetic.dragueur:dragueur:1.0.0'
     testCompile 'junit:junit:4.12'
 }
