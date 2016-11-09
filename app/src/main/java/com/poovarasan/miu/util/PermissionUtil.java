@@ -23,6 +23,8 @@ public abstract class PermissionUtil {
         }
         return true;
     }
+
+
     public static void startInstalledAppDetailsActivity(final Context context) {
         if (context == null) {
             return;

@@ -54,12 +54,13 @@ public class MessageOtherAdapter extends AbstractItem<MessageOtherAdapter, Messa
     }
 
     @Override
-    public void bindView(VH holder, List payloads) {
+    public void bindView(final VH holder, List payloads) {
         super.bindView(holder, payloads);
 
         holder.message.setText(message);
         String dateString = new SimpleDateFormat("MM/dd/yyyy-mm:ss").format(new Date(date));
         holder.time.setText(dateString);
+
     }
 
     protected static class VH extends RecyclerView.ViewHolder {

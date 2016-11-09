@@ -15,6 +15,7 @@
 
     <item
         android:title="View Contact"
+        android:id="@+id/viewcontact"
         app:showAsAction="never" />
 
     <item

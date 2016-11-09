@@ -56,6 +56,8 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -309,7 +311,20 @@ public class MessageActivity extends AppCompatActivity {
 
             if (item.getItemId() == R.id.msgDelete) {
 
+                Set<Integer> selected = otherFastAdapter.getSelections();
+                List<Integer> integers = new ArrayList<>();
                 for (final Integer integer : otherFastAdapter.getSelections()) {
+                    integers.add(integer);
+                }
+
+                Collections.sort(integers, new Comparator<Integer>() {
+                    @Override
+                    public int compare(Integer integer, Integer t1) {
+                        return t1.compareTo(integer);
+                    }
+                });
+
+                for (final Integer integer : integers) {
                     // ;
                     ParseQuery query = ParseQuery.getQuery("MESSAGE");
                     query.fromLocalDatastore();
@@ -320,7 +335,6 @@ public class MessageActivity extends AppCompatActivity {
                         public void done(List<ParseObject> objects, ParseException e) {
                             ParseObject.unpinAllInBackground(objects);
                             otherFastAdapter.remove(integer);
-
                         }
                     });
 
@@ -545,6 +559,13 @@ public class MessageActivity extends AppCompatActivity {
                                 }
                             }
                         }).show();
+                break;
+            }
+
+            case R.id.viewcontact: {
+
+                Intent intent = new Intent(MessageActivity.this, CallActivity.class);
+                startActivity(intent);
                 break;
             }
         }

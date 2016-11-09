@@ -3,6 +3,10 @@
     package="com.poovarasan.miu"
     android:installLocation="auto">
 
+    <uses-feature android:name="android.hardware.sip.voip" android:required="true" />
+    <uses-feature android:name="android.hardware.wifi" android:required="true" />
+    <uses-feature android:name="android.hardware.microphone" android:required="true" />
+
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -15,6 +19,8 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.USE_SIP" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <permission
         android:name="com.poovarasan.miu.permission.C2D_MESSAGE"
@@ -43,6 +49,7 @@
 
         <service android:name="com.parse.PushService" />
 
+        <receiver android:name=".receiver.IncomingCallReceiver"/>
         <receiver
             android:name=".receiver.GCMReceiver"
             android:exported="false">
@@ -105,7 +112,11 @@
             android:label="Profile"
             android:windowSoftInputMode="adjustPan" />
         <activity android:name=".activity.UserProfile" />
-        <activity android:name=".activity.BackupActivity" android:label="Backup"></activity>
+        <activity
+            android:name=".activity.BackupActivity"
+            android:label="Backup" />
+        <activity android:name=".activity.CallActivity">
+        </activity>
     </application>
 
 </manifest>

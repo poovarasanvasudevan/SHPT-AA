@@ -5,8 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginLeft="8dp"
-    android:layout_marginRight="60dp"
+    android:paddingLeft="8dp"
+    android:background="@drawable/selected_rv"
     android:layout_marginTop="@dimen/message_bubble_margin_top">
 
     <FrameLayout
@@ -37,6 +37,7 @@
         android:id="@+id/message_scout_text_view_group_bubble"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginRight="60dp"
         android:layout_toRightOf="@+id/message_scout_text_image_view_avatar_group"
         android:background="@drawable/shape_rounded_rectangle_primary"
         android:padding="10dp">
