@@ -564,8 +564,6 @@ public class MessageActivity extends AppCompatActivity {
 
             case R.id.viewcontact: {
 
-                Intent intent = new Intent(MessageActivity.this, CallActivity.class);
-                startActivity(intent);
                 break;
             }
         }

@@ -19,8 +19,6 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.USE_SIP" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <permission
         android:name="com.poovarasan.miu.permission.C2D_MESSAGE"
@@ -49,7 +47,6 @@
 
         <service android:name="com.parse.PushService" />
 
-        <receiver android:name=".receiver.IncomingCallReceiver"/>
         <receiver
             android:name=".receiver.GCMReceiver"
             android:exported="false">
@@ -115,8 +112,6 @@
         <activity
             android:name=".activity.BackupActivity"
             android:label="Backup" />
-        <activity android:name=".activity.CallActivity">
-        </activity>
     </application>
 
 </manifest>
