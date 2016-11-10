@@ -14,17 +14,17 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.Toast;
 
-import com.parse.ParseException;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.poovarasan.miu.R;
 import com.poovarasan.miu.activity.MessageActivity;
 import com.poovarasan.miu.adapter.ContactAdapter;
 import com.poovarasan.miu.application.App;
 import com.poovarasan.miu.event.TextMessageEvent;
+import com.poovarasan.miu.model.MessageModel;
+import com.poovarasan.miu.model.MessageModelEntityManager;
+import com.poovarasan.miu.model.UserModel;
+import com.poovarasan.miu.model.UserModelEntityManager;
 import com.sromku.simple.storage.Storage;
 
 import org.greenrobot.eventbus.EventBus;
@@ -66,30 +66,33 @@ public class RedisListener extends JedisPubSub {
 
     private void parseMessage(String message) {
         try {
+            MessageModelEntityManager messageModelEntityManager = new MessageModelEntityManager();
             JSONObject jsonObject = new JSONObject(message);
             String type = jsonObject.optString("type");
             switch (type) {
 
                 case "MESSAGE": {
                     String from = jsonObject.optString("from");
-                    long time = new Date().getTime();
+                    long time = jsonObject.optLong("time");
                     String messageType = jsonObject.optString("MESSAGETYPE");
                     switch (messageType) {
                         case "TEXT": {
-                            ParseObject parseObject = new ParseObject("MESSAGE");
-                            parseObject.put("from", from);
-                            parseObject.put("time", time);
-                            parseObject.put("isself", false);
-                            parseObject.put("uniqid", from + "_" + new Random(999999999) + "_" + time);
-                            parseObject.put("messagetype", messageType);
-                            parseObject.put("message", jsonObject.optString("message"));
-                            parseObject.pinInBackground();
 
+                            String tag = from + "_" + new Random(999999999) + "_" + time;
+                            MessageModel messageModel = new MessageModel();
+                            messageModel.setFromUser(from);
+                            messageModel.setMessageTime(time);
+                            messageModel.setSelf(false);
+                            messageModel.setMessageType(messageType);
+                            messageModel.setTag(tag);
+                            messageModel.setMessage(jsonObject.optString("message"));
 
+                            messageModelEntityManager.add(messageModel);
                             EventBus.getDefault().post(new TextMessageEvent(
                                     jsonObject.optString("message"),
                                     from,
-                                    time
+                                    time,
+                                    tag
                             ));
 
                             break;
@@ -108,14 +111,14 @@ public class RedisListener extends JedisPubSub {
                             storage.createFile(PATH, NAME, bitmap);
                             String filePath = App.getStorage(context).getFile(PATH, NAME).getAbsolutePath();
 
-                            ParseObject parseObject = new ParseObject("MESSAGE");
-                            parseObject.put("from", from);
-                            parseObject.put("time", time);
-                            parseObject.put("isself", false);
-                            parseObject.put("uniqid", from + "_" + new Random(999999999) + "_" + time);
-                            parseObject.put("messagetype", messageType);
-                            parseObject.put("imagepath", filePath);
-                            parseObject.pinInBackground();
+                            MessageModel messageModel = new MessageModel();
+                            messageModel.setFromUser(from);
+                            messageModel.setMessageTime(time);
+                            messageModel.setSelf(false);
+                            messageModel.setTag(from + "_" + new Random(999999999) + "_" + time);
+                            messageModel.setMessageType(messageType);
+                            messageModel.setImagePath(filePath);
+                            messageModelEntityManager.add(messageModel);
                             break;
                         }
                         case "VIDEO": {
@@ -223,36 +226,30 @@ public class RedisListener extends JedisPubSub {
     }
 
     public void notifyMe(String message, Context context) {
+
+        UserModelEntityManager userModelEntityManager = new UserModelEntityManager();
         JSONObject jsonObject = null;
         try {
             jsonObject = new JSONObject(message);
 
+            int userCount = userModelEntityManager.select().number().equalsTo(jsonObject.optString("from")).count();
 
-            ParseQuery parseQuery = ParseQuery.getQuery("MyUsers");
-            parseQuery.fromLocalDatastore();
-            parseQuery.whereEqualTo("NUMBER", jsonObject.optString("from"));
-            int parseObjectCount = parseQuery.count();
-
-
-            ParseQuery parseQuery1 = ParseQuery.getQuery("MyUsers");
-            parseQuery1.fromLocalDatastore();
-            parseQuery1.whereEqualTo("NUMBER", jsonObject.optString("from"));
-            ParseObject parseObject = parseQuery1.getFirst();
-            if (parseObjectCount > 0) {
+            if (userCount > 0) {
+                UserModel userModel = userModelEntityManager.select().number().equalsTo(jsonObject.optString("from")).first();
 
 
                 Intent intent = new Intent(context, MessageActivity.class);
                 intent.putExtra("contactDetails", new ContactAdapter(
-                        parseObject.getString("IMAGE"),
-                        parseObject.getString("NAME"),
-                        parseObject.getString("STATUS"),
-                        parseObject.getString("NUMBER"),
+                        userModel.getImage(),
+                        userModel.getName(),
+                        userModel.getStatus(),
+                        userModel.getNumber(),
                         context
                 ));
                 PendingIntent pendingIntent = PendingIntent.getActivity(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
                 PugNotification.with(context)
                         .load()
-                        .title(parseObject.getString("NUMBER") + " sent you a message...")
+                        .title(userModel.getNumber() + " sent you a message...")
                         .bigTextStyle(jsonObject.optString("message"))
                         .smallIcon(R.drawable.ic_whatsapp)
                         .largeIcon(R.drawable.miublue)
@@ -262,15 +259,6 @@ public class RedisListener extends JedisPubSub {
                         .simple()
                         .build();
             } else {
-                Toast.makeText(context, "badcontacft", Toast.LENGTH_LONG).show();
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
-
-            if (e.getCode() == ParseException.OBJECT_NOT_FOUND) {
-
                 Intent intent = new Intent(context, MessageActivity.class);
                 intent.putExtra("contactDetails", new ContactAdapter(
                         App.getDefaultImagePath(context),
@@ -279,6 +267,7 @@ public class RedisListener extends JedisPubSub {
                         jsonObject.optString("from"),
                         context
                 ));
+
                 PendingIntent pendingIntent = PendingIntent.getActivity(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
                 PugNotification.with(context)
                         .load()
@@ -292,6 +281,9 @@ public class RedisListener extends JedisPubSub {
                         .simple()
                         .build();
             }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
 
     }

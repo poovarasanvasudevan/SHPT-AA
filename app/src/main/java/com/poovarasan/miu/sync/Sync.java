@@ -9,10 +9,11 @@ import android.util.Log;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
-import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.poovarasan.miu.application.App;
+import com.poovarasan.miu.model.UserModel;
+import com.poovarasan.miu.model.UserModelEntityManager;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -61,20 +62,22 @@ public class Sync {
 
                 @Override
                 public void done(List<ParseUser> objects, ParseException e) {
-                    ParseQuery query = ParseQuery.getQuery("MyUsers");
-                    query.fromLocalDatastore();
-                    query.findInBackground(new FindCallback<ParseObject>() {
-                        @Override
-                        public void done(List<ParseObject> objects, ParseException e) {
-                            ParseObject.unpinAllInBackground(objects);
-                        }
-                    });
+
+                    UserModelEntityManager userModelEntityManager = new UserModelEntityManager();
+                    userModelEntityManager.deleteAll();
+
                     if (objects != null && objects.size() > 0) {
+                        List<UserModel> allUser = new ArrayList<UserModel>();
                         for (ParseUser parseUser : objects) {
                             if (parseUser.getUsername() != ParseUser.getCurrentUser().getUsername()) {
-                                ParseObject users = new ParseObject("MyUsers");
-                                users.put("NUMBER", parseUser.getUsername());
-                                users.put("STATUS", parseUser.get("status"));
+
+                                String contact[] = getContact(context, parseUser.getUsername()).split(";");
+                                UserModel userModel = new UserModel();
+                                userModel.setActive(true);
+                                userModel.setNumber(parseUser.getUsername());
+                                userModel.setName(contact[0]);
+                                userModel.setStatus(parseUser.getString("status"));
+
 
                                 App.getStorage(context).getFile("Miu/Images/ProfilePic", parseUser.getUsername() + ".png").deleteOnExit();
 
@@ -84,7 +87,8 @@ public class Sync {
                                             .createFile("Miu/Images/ProfilePic", parseUser.getUsername() + ".png", App.byteToBitmap(App.getDefaultImage(context)));
 
                                     File profilePic = App.getStorage(context).getFile("Miu/Images/ProfilePic", parseUser.getUsername() + ".png");
-                                    users.put("IMAGE", profilePic.getAbsolutePath());
+
+                                    userModel.setImage(profilePic.getAbsolutePath());
                                 } else {
 
                                     Log.i("ImageChage", parseUser.getUsername());
@@ -93,13 +97,14 @@ public class Sync {
                                             .createFile("Miu/Images/ProfilePic", parseUser.getUsername() + ".png", App.byteToBitmap(parseUser.getBytes("image")));
 
                                     File profilePic = App.getStorage(context).getFile("Miu/Images/ProfilePic", parseUser.getUsername() + ".png");
-                                    users.put("IMAGE", profilePic.getAbsolutePath());
+                                    userModel.setImage(profilePic.getAbsolutePath());
                                 }
 
-                                users.put("NAME", getContactName(context, parseUser.getUsername()));
-                                users.pinInBackground();
+                                userModel.setContactId(Long.parseLong(contact[1]));
+                                allUser.add(userModel);
                             }
                         }
+                        userModelEntityManager.add(allUser);
                     }
                 }
             });
@@ -123,5 +128,33 @@ public class Sync {
         }
 
         return contactName;
+    }
+
+    public static String getContact(Context context, String phoneNumber) {
+        ContentResolver contentResolver = context.getContentResolver();
+
+        Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
+
+        String[] projection = new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME, ContactsContract.PhoneLookup._ID};
+
+        Cursor cursor =
+                contentResolver.query(
+                        uri,
+                        projection,
+                        null,
+                        null,
+                        null);
+
+        String contactName = "";
+        String contactId = "";
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                contactName = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.PhoneLookup.DISPLAY_NAME));
+                contactId = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.PhoneLookup._ID));
+            }
+            cursor.close();
+        }
+
+        return contactName + ";" + contactId;
     }
 }

@@ -17,6 +17,7 @@ import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -35,10 +36,6 @@ import com.mikepenz.fastadapter.adapters.HeaderAdapter;
 import com.mikepenz.fastadapter_extensions.ActionModeHelper;
 import com.mikepenz.fastadapter_extensions.UndoHelper;
 import com.mikepenz.materialize.MaterializeBuilder;
-import com.parse.FindCallback;
-import com.parse.ParseException;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.poovarasan.miu.R;
 import com.poovarasan.miu.adapter.ContactAdapter;
@@ -47,6 +44,11 @@ import com.poovarasan.miu.adapter.MessageSelfAdapter;
 import com.poovarasan.miu.application.App;
 import com.poovarasan.miu.databinding.ActivityMessageBinding;
 import com.poovarasan.miu.event.TextMessageEvent;
+import com.poovarasan.miu.model.MessageModel;
+import com.poovarasan.miu.model.MessageModelColumns;
+import com.poovarasan.miu.model.MessageModelEntityManager;
+import com.poovarasan.miu.model.UserModelEntityManager;
+import com.sromku.simple.storage.Storage;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -55,6 +57,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -63,6 +66,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import fr.xebia.android.freezer.async.Callback;
 import hani.momanii.supernova_emoji_library.Actions.EmojIconActions;
 import pl.aprilapps.easyphotopicker.DefaultCallback;
 import pl.aprilapps.easyphotopicker.EasyImage;
@@ -80,22 +84,28 @@ public class MessageActivity extends AppCompatActivity {
 
     HeaderAdapter<MessageSelfAdapter> selfFastAdapter;
     FastItemAdapter<IItem> otherFastAdapter;
+    UserModelEntityManager userModelEntityManager;
+    MessageModelEntityManager messageModelEntityManager;
 
 
     Jedis jedis;
     private ActionModeHelper actionModeHelper;
     List<Integer> pos;
     private UndoHelper undoHelper;
+    Storage storage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activityMessageBinding = DataBindingUtil.setContentView(this, R.layout.activity_message);
 
+        userModelEntityManager = new UserModelEntityManager();
+        messageModelEntityManager = new MessageModelEntityManager();
         new MaterializeBuilder().withActivity(this).build();
         // setTheme(R.style.GreenTheme);
         setSupportActionBar(activityMessageBinding.toolbar);
         pos = new ArrayList<>();
+        storage = App.getStorage(getApplicationContext());
 
         final Intent intent = getIntent();
         contactAdapter = intent.getParcelableExtra("contactDetails");
@@ -114,7 +124,6 @@ public class MessageActivity extends AppCompatActivity {
                 finish();
             }
         });
-
 
         Jedis jedis = App.getRedis();
         mikeModification(0);
@@ -180,19 +189,21 @@ public class MessageActivity extends AppCompatActivity {
 
                 if (sendType == 1) {
 
-                    JSONObject jsonObject = new JSONObject();
+                    if (activityMessageBinding.messageText.getText().toString().trim().length() > 0) {
+                        JSONObject jsonObject = new JSONObject();
 
-                    try {
-                        jsonObject.put("type", "MESSAGE");
-                        //{'type':'MESSAGE','from':'9789197654','MESSAGETYPE':'TEXT','message':'Hello Poosan'}
-                        jsonObject.put("from", ParseUser.getCurrentUser().getUsername());
-                        jsonObject.put("MESSAGETYPE", "TEXT");
-                        jsonObject.put("time", new Date().getTime());
-                        jsonObject.put("message", activityMessageBinding.messageText.getText().toString().trim());
+                        try {
+                            jsonObject.put("type", "MESSAGE");
+                            jsonObject.put("from", ParseUser.getCurrentUser().getUsername());
+                            jsonObject.put("MESSAGETYPE", "TEXT");
+                            jsonObject.put("time", new Date().getTime());
+                            jsonObject.put("message", activityMessageBinding.messageText.getText().toString().trim());
 
-                        AsyncTaskCompat.executeParallel(new SendMessageTask(), jsonObject);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                            activityMessageBinding.messageText.setText("");
+                            AsyncTaskCompat.executeParallel(new SendMessageTask(), jsonObject);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
 
 
@@ -248,26 +259,45 @@ public class MessageActivity extends AppCompatActivity {
 
         activityMessageBinding.userMessage.setAdapter(otherFastAdapter);
 
-        ParseQuery query = ParseQuery.getQuery("MESSAGE");
-        query.fromLocalDatastore();
-        query.whereEqualTo("from", contactAdapter.getNumber());
-        query.orderByAscending("time");
 
-
-        query.findInBackground(new FindCallback<ParseObject>() {
+        messageModelEntityManager.select().fromUser().equalsTo(contactAdapter.getNumber()).sortAsc(MessageModelColumns.messageTime).async(new Callback<List<MessageModel>>() {
             @Override
-            public void done(List<ParseObject> objects, ParseException e) {
-                for (ParseObject parseObject : objects) {
-                    if (parseObject.getBoolean("isself") == false) {
+            public void onSuccess(List<MessageModel> data) {
+                for (MessageModel messageModel : data) {
+                    if (messageModel.isSelf() == false) {
+
                         otherFastAdapter.add(new MessageOtherAdapter(
-                                parseObject.getString("message"),
-                                parseObject.getLong("time")
-                        ).withTag(parseObject.getString("uniqid")));
+                                messageModel.getMessage(),
+                                messageModel.getMessageTime()
+                        ).withTag(messageModel.getTag()));
                     } else {
+
                         otherFastAdapter.add(new MessageSelfAdapter(
-                                parseObject.getString("message"),
-                                parseObject.getLong("time")
-                        ).withTag(parseObject.getString("uniqid")));
+                                messageModel.getMessage(),
+                                messageModel.getMessageTime()
+                        ).withTag(messageModel.getTag()));
+                    }
+                }
+
+                activityMessageBinding.userMessage.smoothScrollToPosition(otherFastAdapter.getItemCount());
+            }
+
+            @Override
+            public void onError(List<MessageModel> data) {
+
+                for (MessageModel messageModel : data) {
+                    if (messageModel.isSelf() == false) {
+
+                        otherFastAdapter.add(new MessageOtherAdapter(
+                                messageModel.getMessage(),
+                                messageModel.getMessageTime()
+                        ).withTag(messageModel.getTag()));
+                    } else {
+
+                        otherFastAdapter.add(new MessageSelfAdapter(
+                                messageModel.getMessage(),
+                                messageModel.getMessageTime()
+                        ).withTag(messageModel.getTag()));
                     }
                 }
 
@@ -275,13 +305,13 @@ public class MessageActivity extends AppCompatActivity {
             }
         });
 
-
         activityMessageBinding.messageText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean b) {
                 activityMessageBinding.userMessage.smoothScrollToPosition(otherFastAdapter.getItemCount());
             }
         });
+
     }
 
     private void setClipboard(Context context, String text) {
@@ -325,20 +355,11 @@ public class MessageActivity extends AppCompatActivity {
                 });
 
                 for (final Integer integer : integers) {
-                    // ;
-                    ParseQuery query = ParseQuery.getQuery("MESSAGE");
-                    query.fromLocalDatastore();
-                    query.whereEqualTo("uniqid", (String) otherFastAdapter.getItem(integer).getTag());
-                    query.findInBackground(new FindCallback<ParseObject>() {
-
-                        @Override
-                        public void done(List<ParseObject> objects, ParseException e) {
-                            ParseObject.unpinAllInBackground(objects);
-                            otherFastAdapter.remove(integer);
-                        }
-                    });
-
-
+                    MessageModel messageModel = messageModelEntityManager.select().tag().equalsTo((String) otherFastAdapter.getItem(integer).getTag()).first();
+                    if (messageModel != null) {
+                        messageModelEntityManager.delete(messageModel);
+                        otherFastAdapter.remove(integer);
+                    }
                 }
 
 
@@ -382,14 +403,16 @@ public class MessageActivity extends AppCompatActivity {
             long result = App.getRedis().publish(contactAdapter.getNumber(), jsonObjects[0].toString());
             JSONObject jsonObject = jsonObjects[0];
 
-            ParseObject parseObject = new ParseObject("MESSAGE");
-            parseObject.put("from", contactAdapter.getNumber());
-            parseObject.put("time", jsonObject.optLong("time"));
-            parseObject.put("messagetype", "TEXT");
-            parseObject.put("isself", true);
-            parseObject.put("uniqid", contactAdapter.getNumber() + "_" + new Random(999999999) + "_" + jsonObject.optLong("time"));
-            parseObject.put("message", jsonObject.optString("message"));
-            parseObject.pinInBackground();
+            MessageModel messageModel = new MessageModel();
+            messageModel.setFromUser(contactAdapter.getNumber());
+            messageModel.setMessageTime(jsonObject.optLong("time"));
+            messageModel.setMessageType("TEXT");
+            messageModel.setSelf(true);
+            messageModel.setTag(contactAdapter.getNumber() + "_" + new Random(999999999) + "_" + jsonObject.optLong("time"));
+            messageModel.setMessage(jsonObject.optString("message"));
+            messageModelEntityManager.add(messageModel);
+
+            Log.i("Time", jsonObject.optLong("time") + "");
             if (result < 1) {
                 App.getRedis().lpush(contactAdapter.getNumber() + ".messagequque", jsonObjects[0].toString());
             }
@@ -425,6 +448,26 @@ public class MessageActivity extends AppCompatActivity {
         }
     }
 
+    public byte[] getBytes(File file) {
+        FileInputStream input = null;
+        if (file.exists()) try {
+            input = new FileInputStream(file);
+            int len = (int) file.length();
+            byte[] data = new byte[len];
+            int count, total = 0;
+            while ((count = input.read(data, total, len - total)) > 0) total += count;
+            return data;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            if (input != null) try {
+                input.close();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+        return null;
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -439,6 +482,7 @@ public class MessageActivity extends AppCompatActivity {
             @Override
             public void onImagePicked(final File imageFile, EasyImage.ImageSource source, int type) {
 
+
                 if (source == EasyImage.ImageSource.GALLERY) {
 
                 } else if (source == EasyImage.ImageSource.CAMERA) {
@@ -447,6 +491,7 @@ public class MessageActivity extends AppCompatActivity {
 
                 }
             }
+
 
             @Override
             public void onCanceled(EasyImage.ImageSource source, int type) {
@@ -503,14 +548,17 @@ public class MessageActivity extends AppCompatActivity {
                         .onPositive(new MaterialDialog.SingleButtonCallback() {
                             @Override
                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                ParseQuery query = ParseQuery.getQuery("MESSAGE");
-                                query.fromLocalDatastore();
-                                query.whereEqualTo("from", contactAdapter.getNumber());
-                                query.findInBackground(new FindCallback<ParseObject>() {
-                                    @Override
-                                    public void done(List<ParseObject> objects, ParseException e) {
-                                        ParseObject.unpinAllInBackground(objects);
 
+                                messageModelEntityManager.select().fromUser().equalsTo(contactAdapter.getNumber()).async(new Callback<List<MessageModel>>() {
+                                    @Override
+                                    public void onSuccess(List<MessageModel> data) {
+                                        messageModelEntityManager.delete(data);
+                                        otherFastAdapter.clear();
+                                    }
+
+                                    @Override
+                                    public void onError(List<MessageModel> data) {
+                                        messageModelEntityManager.delete(data);
                                         otherFastAdapter.clear();
                                     }
                                 });
@@ -566,6 +614,7 @@ public class MessageActivity extends AppCompatActivity {
 
                 break;
             }
+
         }
 
         return super.onOptionsItemSelected(item);
@@ -590,8 +639,10 @@ public class MessageActivity extends AppCompatActivity {
             otherFastAdapter.add(new MessageOtherAdapter(
                     event.getMessage(),
                     event.getTime()
-            ));
+            ).withTag(event.getTag()));
             activityMessageBinding.userMessage.smoothScrollToPosition(otherFastAdapter.getItemCount());
         }
     }
+
+
 }

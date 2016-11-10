@@ -24,6 +24,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.Random;
 
+import fr.xebia.android.freezer.Freezer;
 import pl.tajchert.nammu.Nammu;
 import redis.clients.jedis.Jedis;
 
@@ -56,6 +57,7 @@ public class App extends Application {
         resources = getResources();
 
         Nammu.init(this);
+        Freezer.onCreate(this);
 //        EasyImage.configuration(this)
 //                .setImagesFolderName("MiuImages")
 //                .saveInAppExternalFilesDir()
@@ -143,6 +145,7 @@ public class App extends Application {
 
                 storage.createDirectory("Miu");
                 storage.createDirectory("Miu/Images/ProfilePic");
+                storage.createDirectory("Miu/Images/Wallpaper");
                 storage.createDirectory("Miu/Messages/Media");
                 storage.createDirectory("Miu/Messages/Media/Audio");
                 storage.createDirectory("Miu/Messages/Media/Image");
@@ -154,6 +157,7 @@ public class App extends Application {
 
                 storage.createDirectory("Miu");
                 storage.createDirectory("Miu/Images/ProfilePic");
+                storage.createDirectory("Miu/Images/Wallpaper");
                 storage.createDirectory("Miu/Messages/Media");
                 storage.createDirectory("Miu/Messages/Media/Audio");
                 storage.createDirectory("Miu/Messages/Media/Image");

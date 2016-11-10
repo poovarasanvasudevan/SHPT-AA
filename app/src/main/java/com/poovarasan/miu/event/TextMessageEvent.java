@@ -8,11 +8,22 @@ public class TextMessageEvent {
     String message;
     String number;
     long time;
+    String tag;
 
-    public TextMessageEvent(String message, String number, long time) {
+
+    public TextMessageEvent(String message, String number, long time, String tag) {
         this.message = message;
         this.number = number;
         this.time = time;
+        this.tag = tag;
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
     }
 
     public String getMessage() {

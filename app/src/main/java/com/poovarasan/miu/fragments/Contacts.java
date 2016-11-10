@@ -16,7 +16,6 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,14 +27,13 @@ import com.mikepenz.fastadapter.FastAdapter;
 import com.mikepenz.fastadapter.IAdapter;
 import com.mikepenz.fastadapter.IItemAdapter;
 import com.mikepenz.fastadapter.adapters.FastItemAdapter;
-import com.parse.FindCallback;
-import com.parse.ParseException;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
 import com.poovarasan.miu.R;
 import com.poovarasan.miu.activity.MessageActivity;
 import com.poovarasan.miu.adapter.ContactAdapter;
 import com.poovarasan.miu.databinding.FragmentContactsBinding;
+import com.poovarasan.miu.model.UserModel;
+import com.poovarasan.miu.model.UserModelColumns;
+import com.poovarasan.miu.model.UserModelEntityManager;
 import com.poovarasan.miu.sync.Sync;
 
 import java.util.ArrayList;
@@ -55,6 +53,7 @@ public class Contacts extends Fragment {
     FragmentContactsBinding fragmentContactsBinding;
     int permisssionDeniedType = 0;
     FastItemAdapter<ContactAdapter> fastAdapter;
+    UserModelEntityManager userModelEntity;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -67,6 +66,7 @@ public class Contacts extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         fragmentContactsBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_contacts, container, false);
 
+        userModelEntity = new UserModelEntityManager();
 
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
@@ -130,42 +130,33 @@ public class Contacts extends Fragment {
 
 
     public void load() {
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("MyUsers");
-        query.fromLocalDatastore();
-        query.addAscendingOrder("NAME");
-        query.findInBackground(new FindCallback<ParseObject>() {
+        List<UserModel> allUsers = userModelEntity.select().sortAsc(UserModelColumns.name).asList();
+
+        fastAdapter = new FastItemAdapter<>();
+        fragmentContactsBinding.allcontacts.setAdapter(fastAdapter);
+
+        List<ContactAdapter> contactAdapters = new ArrayList<>();
+        for (UserModel userModel : allUsers) {
+            contactAdapters.add(new ContactAdapter(
+                    userModel.getImage(),
+                    userModel.getName(),
+                    userModel.getStatus(),
+                    userModel.getNumber(),
+                    getActivity().getApplicationContext()
+            ));
+        }
+
+        fastAdapter.add(contactAdapters);
+        fastAdapter.notifyAdapterDataSetChanged();
+        fastAdapter.withOnClickListener(new FastAdapter.OnClickListener<ContactAdapter>() {
             @Override
-            public void done(List<ParseObject> objects, ParseException e) {
-
-                fastAdapter = new FastItemAdapter<>();
-                fragmentContactsBinding.allcontacts.setAdapter(fastAdapter);
-
-                List<ContactAdapter> contactAdapters = new ArrayList<>();
-                for (ParseObject parseObject : objects) {
-                    Log.i("Loaded123", parseObject.getString("NUMBER"));
-
-                    contactAdapters.add(new ContactAdapter(
-                            parseObject.getString("IMAGE"),
-                            parseObject.getString("NAME"),
-                            parseObject.getString("STATUS"),
-                            parseObject.getString("NUMBER"),
-                            getActivity().getApplicationContext()
-                    ));
-                }
-                fastAdapter.add(contactAdapters);
-                fastAdapter.notifyAdapterDataSetChanged();
-                fastAdapter.withOnClickListener(new FastAdapter.OnClickListener<ContactAdapter>() {
-                    @Override
-                    public boolean onClick(View v, IAdapter<ContactAdapter> adapter, ContactAdapter item, int position) {
-                        Intent intent = new Intent(getActivity(), MessageActivity.class);
-                        intent.putExtra("contactDetails", item);
-                        ActivityCompat.startActivity(getActivity(), intent, null);
-                        return false;
-                    }
-                });
+            public boolean onClick(View v, IAdapter<ContactAdapter> adapter, ContactAdapter item, int position) {
+                Intent intent = new Intent(getActivity(), MessageActivity.class);
+                intent.putExtra("contactDetails", item);
+                ActivityCompat.startActivity(getActivity(), intent, null);
+                return false;
             }
         });
-
     }
 
 
@@ -223,13 +214,13 @@ public class Contacts extends Fragment {
 
             Sync sync = new Sync(getActivity().getApplicationContext());
             sync.makeSync();
-            load();
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
 
+            load();
             fragmentContactsBinding.contactRefresh.setRefreshing(false);
             super.onPostExecute(aVoid);
         }
