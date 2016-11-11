@@ -288,7 +288,7 @@ public class MessageActivity extends AppCompatActivity {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 // Log.i(dx + "-->", dy + "-->");
-                if (llm.findFirstCompletelyVisibleItemPosition() < 2) {
+                if (llm.findFirstCompletelyVisibleItemPosition() < 1) {
                     loadNext(false);
                 }
                 Log.i(llm.findFirstCompletelyVisibleItemPosition() + "-->", llm.findLastCompletelyVisibleItemPosition() + "-->");
@@ -326,6 +326,8 @@ public class MessageActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(List<MessageModel> data) {
                             for (MessageModel messageModel : data) {
+
+                                Log.i("IdValue:", messageModel.getId() + "-->");
                                 if (messageModel.isSelf() == false) {
 
                                     if (startMessage == false) {
@@ -334,7 +336,7 @@ public class MessageActivity extends AppCompatActivity {
                                                 messageModel.getMessageTime()
                                         ).withTag(messageModel.getTag()));
                                     } else {
-                                        otherFastAdapter.add(new MessageOtherAdapter(
+                                        otherFastAdapter.add(0, new MessageOtherAdapter(
                                                 messageModel.getMessage(),
                                                 messageModel.getMessageTime()
                                         ).withTag(messageModel.getTag()));
@@ -347,7 +349,7 @@ public class MessageActivity extends AppCompatActivity {
                                                 messageModel.getMessageTime()
                                         ).withTag(messageModel.getTag()));
                                     } else {
-                                        otherFastAdapter.add(new MessageSelfAdapter(
+                                        otherFastAdapter.add(0, new MessageSelfAdapter(
                                                 messageModel.getMessage(),
                                                 messageModel.getMessageTime()
                                         ).withTag(messageModel.getTag()));
