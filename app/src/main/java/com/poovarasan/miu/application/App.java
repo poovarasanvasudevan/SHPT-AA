@@ -15,6 +15,8 @@ import com.parse.Parse;
 import com.parse.ParseInstallation;
 import com.parse.ParseUser;
 import com.poovarasan.miu.R;
+import com.poovarasan.miu.model.RecentMessages;
+import com.poovarasan.miu.model.RecentMessagesEntityManager;
 import com.poovarasan.miu.service.RedisService;
 import com.sromku.simple.storage.SimpleStorage;
 import com.sromku.simple.storage.Storage;
@@ -38,6 +40,7 @@ public class App extends Application {
     static Jedis jedis;
     static Resources resources;
     static Storage storage = null;
+    static RecentMessagesEntityManager recentMessagesEntityManager;
 
     @Override
     public void onCreate() {
@@ -51,6 +54,8 @@ public class App extends Application {
                 .server("https://agile-cliffs-51843.herokuapp.com/parse")
                 .build()
         );
+
+        recentMessagesEntityManager = new RecentMessagesEntityManager();
         ParseInstallation
                 .getCurrentInstallation()
                 .saveInBackground();
@@ -69,6 +74,35 @@ public class App extends Application {
         Intent intent = new Intent(this, RedisService.class);
         startService(intent);
 
+    }
+
+    public static String saveImage(String number, byte[] image, Context context) {
+        if (App.isOnline(context)) {
+            App
+                    .getStorage(context)
+                    .createFile("Miu/Images/ProfilePic", number + ".png", App.byteToBitmap(image));
+
+            File profilePic = App.getStorage(context).getFile("Miu/Images/ProfilePic", number + ".png");
+            return profilePic.getAbsolutePath();
+        } else {
+            return App.getDefaultImagePath(context);
+        }
+    }
+
+    public static void addToRecent(String number, String message) {
+        int isUserExists = recentMessagesEntityManager.select().numbers().equalsTo(number).count();
+        if (isUserExists == 0) {
+            RecentMessages recentMessages = new RecentMessages();
+            recentMessages.setNumbers(number);
+            recentMessages.setRecentMessage(message);
+            recentMessages.setUpdatedTime(new Date());
+            recentMessagesEntityManager.add(recentMessages);
+        } else {
+            RecentMessages recentMessages = recentMessagesEntityManager.select().numbers().equalsTo(number).first();
+            recentMessages.setUpdatedTime(new Date());
+            recentMessages.setRecentMessage(message);
+            recentMessagesEntityManager.update(recentMessages);
+        }
     }
 
     public static void setOnline() {

@@ -70,6 +70,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import fr.xebia.android.freezer.Freezer;
 import fr.xebia.android.freezer.QueryLogger;
 import fr.xebia.android.freezer.async.Callback;
 import hani.momanii.supernova_emoji_library.Actions.EmojIconActions;
@@ -334,6 +335,9 @@ public class MessageActivity extends AppCompatActivity {
             }
         });
 
+        Freezer.getInstance().getDatabase();
+
+
         int count = messageModelEntityManager
                 .select()
                 .fromUser()
@@ -511,6 +515,8 @@ public class MessageActivity extends AppCompatActivity {
             messageModel.setMessage(jsonObject.optString("message"));
             messageModelEntityManager.add(messageModel);
 
+            App.addToRecent(contactAdapter.getNumber(), jsonObject.optString("message"));
+
             Log.i("Time", jsonObject.optLong("time") + "");
             if (result < 1) {
                 App.getRedis().lpush(contactAdapter.getNumber() + ".messagequque", jsonObjects[0].toString());
@@ -613,6 +619,15 @@ public class MessageActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.message_activity_menu, menu);
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    protected void onPostResume() {
+
+        otherFastAdapter.clear();
+        loadNext(true);
+
+        super.onPostResume();
     }
 
     @Override

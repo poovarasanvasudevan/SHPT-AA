@@ -23,6 +23,7 @@ import com.poovarasan.miu.application.App;
 import com.poovarasan.miu.event.TextMessageEvent;
 import com.poovarasan.miu.model.MessageModel;
 import com.poovarasan.miu.model.MessageModelEntityManager;
+import com.poovarasan.miu.model.RecentMessagesEntityManager;
 import com.poovarasan.miu.model.UserModel;
 import com.poovarasan.miu.model.UserModelEntityManager;
 import com.sromku.simple.storage.Storage;
@@ -67,6 +68,7 @@ public class RedisListener extends JedisPubSub {
     private void parseMessage(String message) {
         try {
             MessageModelEntityManager messageModelEntityManager = new MessageModelEntityManager();
+            RecentMessagesEntityManager recentMessagesEntityManager = new RecentMessagesEntityManager();
             JSONObject jsonObject = new JSONObject(message);
             String type = jsonObject.optString("type");
             switch (type) {
@@ -86,8 +88,11 @@ public class RedisListener extends JedisPubSub {
                             messageModel.setMessageType(messageType);
                             messageModel.setTag(tag);
                             messageModel.setMessage(jsonObject.optString("message"));
-
                             messageModelEntityManager.add(messageModel);
+
+                            App.addToRecent(from,jsonObject.optString("message"));
+
+
                             EventBus.getDefault().post(new TextMessageEvent(
                                     jsonObject.optString("message"),
                                     from,
