@@ -29,26 +29,6 @@
         android:src="@drawable/vd_ic_user_carrot"
         android:tint="@color/background_white" />
 
-    <FrameLayout
-        android:id="@+id/message_user_text_view_group_bubble"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="60dp"
-        android:layout_toLeftOf="@+id/message_user_text_view_group_avatar"
-        android:background="@drawable/shape_rounded_rectangle_white"
-        android:padding="10dp">
-
-        <hani.momanii.supernova_emoji_library.Helper.EmojiconTextView
-            android:id="@+id/message_user_text_text_view_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:autoLink="web"
-            android:gravity="left"
-            android:textColor="@color/text_navy"
-            android:textSize="14sp"
-            tools:text="In need of pizza. Can you help?" />
-    </FrameLayout>
-
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/message_user_text_text_view_timestamp"
         android:layout_width="wrap_content"
@@ -59,7 +39,29 @@
         android:layout_marginTop="@dimen/message_timestamp_margin_top"
         android:gravity="right"
         android:singleLine="true"
-        android:textColor="@color/text_gray_darkest"
-        android:textSize="10sp"
+        android:textColor="@color/md_black_1000"
+        android:textSize="10dp"
+        android:textStyle="bold"
         tools:text="12:29pm" />
+
+    <FrameLayout
+        android:id="@+id/message_user_text_view_group_bubble"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/shape_rounded_rectangle_white"
+        android:padding="10dp"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/message_user_text_view_group_avatar"
+        android:layout_toStartOf="@+id/message_user_text_view_group_avatar">
+
+        <hani.momanii.supernova_emoji_library.Helper.EmojiconTextView
+            android:id="@+id/message_user_text_text_view_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:autoLink="web"
+            android:gravity="left"
+            android:textColor="@color/text_navy"
+            android:textSize="13dp"
+            tools:text="In need of pizza. Can you help?" />
+    </FrameLayout>
 </RelativeLayout>

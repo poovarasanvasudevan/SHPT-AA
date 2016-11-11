@@ -20,6 +20,7 @@ public class UserModel {
     boolean isActive;
     String status;
 
+
     public long getContactId() {
         return contactId;
     }

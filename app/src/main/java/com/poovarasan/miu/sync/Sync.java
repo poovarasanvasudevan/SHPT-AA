@@ -8,7 +8,9 @@ import android.provider.ContactsContract;
 import android.util.Log;
 
 import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.poovarasan.miu.application.App;
@@ -108,6 +110,54 @@ public class Sync {
                     }
                 }
             });
+        }
+    }
+
+    public void syncUser(final String number) {
+        final UserModelEntityManager userModelEntityManager = new UserModelEntityManager();
+
+        if (App.isOnline(context)) {
+
+            ParseQuery query = ParseUser.getQuery();
+            query.whereEqualTo("username", number);
+            query.getFirstInBackground(new GetCallback() {
+                @Override
+                public void done(ParseObject object, ParseException e) {
+                    if (e == null) {
+                        UserModel userModel = userModelEntityManager.select().number().equalsTo(number).first();
+                        userModel.setStatus(object.getString("STATUS"));
+
+                        App.getStorage(context).getFile("Miu/Images/ProfilePic", object.getString("username") + ".png").deleteOnExit();
+
+                        if (object.getBytes("image") == null) {
+                            App
+                                    .getStorage(context)
+                                    .createFile("Miu/Images/ProfilePic", object.getString("username") + ".png", App.byteToBitmap(App.getDefaultImage(context)));
+
+                            File profilePic = App.getStorage(context).getFile("Miu/Images/ProfilePic", object.getString("username") + ".png");
+
+                            userModel.setImage(profilePic.getAbsolutePath());
+                        } else {
+
+                            Log.i("ImageChage", object.getString("username"));
+                            App
+                                    .getStorage(context)
+                                    .createFile("Miu/Images/ProfilePic", object.getString("username") + ".png", App.byteToBitmap(object.getBytes("image")));
+
+                            File profilePic = App.getStorage(context).getFile("Miu/Images/ProfilePic", object.getString("username") + ".png");
+                            userModel.setImage(profilePic.getAbsolutePath());
+                        }
+
+                        userModelEntityManager.update(userModel);
+                    }
+                }
+
+                @Override
+                public void done(Object o, Throwable throwable) {
+
+                }
+            });
+
         }
     }
 

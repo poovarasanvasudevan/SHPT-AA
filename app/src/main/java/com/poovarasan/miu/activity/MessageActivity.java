@@ -49,7 +49,9 @@ import com.poovarasan.miu.event.TextMessageEvent;
 import com.poovarasan.miu.model.MessageModel;
 import com.poovarasan.miu.model.MessageModelColumns;
 import com.poovarasan.miu.model.MessageModelEntityManager;
+import com.poovarasan.miu.model.UserModel;
 import com.poovarasan.miu.model.UserModelEntityManager;
+import com.poovarasan.miu.sync.Sync;
 import com.sromku.simple.storage.Storage;
 
 import org.greenrobot.eventbus.EventBus;
@@ -295,6 +297,30 @@ public class MessageActivity extends AppCompatActivity {
                 super.onScrolled(recyclerView, dx, dy);
             }
         });
+
+        if (App.isOnline(getApplicationContext())) {
+            AsyncTaskCompat.executeParallel(new SyncSingleUser(), null);
+        }
+    }
+
+    class SyncSingleUser extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... voids) {
+            Sync sync = new Sync(getApplicationContext());
+            sync.syncUser(contactAdapter.getNumber());
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            UserModel userModel = userModelEntityManager.select().number().equalsTo(contactAdapter.getNumber()).first();
+            activityMessageBinding.toolBarSubtitle.setText("Online");
+            Glide.with(getApplicationContext())
+                    .load(new File(userModel.getImage()))
+                    .into(activityMessageBinding.toolbarProfileImage);
+        }
     }
 
 

@@ -58,7 +58,7 @@ public class MessageSelfAdapter extends AbstractItem<MessageSelfAdapter, Message
         super.bindView(holder, payloads);
 
         holder.message.setText(message);
-        String dateString = new SimpleDateFormat("MM/dd/yyyy-mm:ss").format(new Date(date));
+        String dateString = new SimpleDateFormat("dd/MM/yyyy-mm:ss").format(new Date(date));
         holder.time.setText(dateString);
 
     }

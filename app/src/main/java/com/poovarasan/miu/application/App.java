@@ -22,6 +22,7 @@ import com.sromku.simple.storage.Storage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.util.Date;
 import java.util.Random;
 
 import fr.xebia.android.freezer.Freezer;
@@ -175,6 +176,10 @@ public class App extends Application {
         return bitmap;
     }
 
+
+    public Date getCurrentDateTime() {
+        return new Date();
+    }
 
     public static Jedis getRedis() {
         return new Jedis("10.0.2.2");
