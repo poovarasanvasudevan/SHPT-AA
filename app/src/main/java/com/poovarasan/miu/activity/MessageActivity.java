@@ -15,6 +15,7 @@ import android.support.v4.os.AsyncTaskCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -35,6 +36,7 @@ import com.mikepenz.fastadapter.adapters.FastItemAdapter;
 import com.mikepenz.fastadapter.adapters.HeaderAdapter;
 import com.mikepenz.fastadapter_extensions.ActionModeHelper;
 import com.mikepenz.fastadapter_extensions.UndoHelper;
+import com.mikepenz.fastadapter_extensions.items.ProgressItem;
 import com.mikepenz.materialize.MaterializeBuilder;
 import com.parse.ParseUser;
 import com.poovarasan.miu.R;
@@ -66,6 +68,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import fr.xebia.android.freezer.QueryLogger;
 import fr.xebia.android.freezer.async.Callback;
 import hani.momanii.supernova_emoji_library.Actions.EmojIconActions;
 import pl.aprilapps.easyphotopicker.DefaultCallback;
@@ -93,6 +96,10 @@ public class MessageActivity extends AppCompatActivity {
     List<Integer> pos;
     private UndoHelper undoHelper;
     Storage storage;
+    int startPosition = 0;
+    int limit = 15;
+
+    private HeaderAdapter<ProgressItem> footerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +116,7 @@ public class MessageActivity extends AppCompatActivity {
 
         final Intent intent = getIntent();
         contactAdapter = intent.getParcelableExtra("contactDetails");
+        footerAdapter = new HeaderAdapter<>();
 
         Glide.with(this)
                 .load(new File(contactAdapter.getImage()))
@@ -252,7 +260,7 @@ public class MessageActivity extends AppCompatActivity {
             }
         });
 
-        LinearLayoutManager llm = new LinearLayoutManager(this);
+        final LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         llm.setStackFromEnd(true);
         activityMessageBinding.userMessage.setLayoutManager(llm);
@@ -260,50 +268,8 @@ public class MessageActivity extends AppCompatActivity {
         activityMessageBinding.userMessage.setAdapter(otherFastAdapter);
 
 
-        messageModelEntityManager.select().fromUser().equalsTo(contactAdapter.getNumber()).sortAsc(MessageModelColumns.messageTime).async(new Callback<List<MessageModel>>() {
-            @Override
-            public void onSuccess(List<MessageModel> data) {
-                for (MessageModel messageModel : data) {
-                    if (messageModel.isSelf() == false) {
-
-                        otherFastAdapter.add(new MessageOtherAdapter(
-                                messageModel.getMessage(),
-                                messageModel.getMessageTime()
-                        ).withTag(messageModel.getTag()));
-                    } else {
-
-                        otherFastAdapter.add(new MessageSelfAdapter(
-                                messageModel.getMessage(),
-                                messageModel.getMessageTime()
-                        ).withTag(messageModel.getTag()));
-                    }
-                }
-
-                activityMessageBinding.userMessage.smoothScrollToPosition(otherFastAdapter.getItemCount());
-            }
-
-            @Override
-            public void onError(List<MessageModel> data) {
-
-                for (MessageModel messageModel : data) {
-                    if (messageModel.isSelf() == false) {
-
-                        otherFastAdapter.add(new MessageOtherAdapter(
-                                messageModel.getMessage(),
-                                messageModel.getMessageTime()
-                        ).withTag(messageModel.getTag()));
-                    } else {
-
-                        otherFastAdapter.add(new MessageSelfAdapter(
-                                messageModel.getMessage(),
-                                messageModel.getMessageTime()
-                        ).withTag(messageModel.getTag()));
-                    }
-                }
-
-                activityMessageBinding.userMessage.smoothScrollToPosition(otherFastAdapter.getItemCount());
-            }
-        });
+        loadNext(true);
+        activityMessageBinding.userMessage.smoothScrollToPosition(otherFastAdapter.getItemCount());
 
         activityMessageBinding.messageText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -312,6 +278,111 @@ public class MessageActivity extends AppCompatActivity {
             }
         });
 
+
+        activityMessageBinding.userMessage.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                // Log.i(dx + "-->", dy + "-->");
+                if (llm.findFirstCompletelyVisibleItemPosition() < 2) {
+                    loadNext(false);
+                }
+                Log.i(llm.findFirstCompletelyVisibleItemPosition() + "-->", llm.findLastCompletelyVisibleItemPosition() + "-->");
+                super.onScrolled(recyclerView, dx, dy);
+            }
+        });
+    }
+
+
+    public void loadNext(final boolean startMessage) {
+
+        Log.i("LoadingData", startPosition + "...Loading");
+        messageModelEntityManager.logQueries(new QueryLogger() {
+            @Override
+            public void onQuery(String query, String[] datas) {
+                Log.d("MESSAGELOG", query);
+            }
+        });
+
+        int count = messageModelEntityManager
+                .select()
+                .fromUser()
+                .equalsTo(contactAdapter.getNumber())
+                .sortDesc(MessageModelColumns.id)
+                .count();
+
+        if (count > startPosition) {
+            messageModelEntityManager
+                    .select()
+                    .fromUser()
+                    .equalsTo(contactAdapter.getNumber())
+                    .sortDesc(MessageModelColumns.id)
+                    .limit(startPosition, limit)
+                    .async(new Callback<List<MessageModel>>() {
+                        @Override
+                        public void onSuccess(List<MessageModel> data) {
+                            for (MessageModel messageModel : data) {
+                                if (messageModel.isSelf() == false) {
+
+                                    if (startMessage == false) {
+                                        otherFastAdapter.add(0, new MessageOtherAdapter(
+                                                messageModel.getMessage(),
+                                                messageModel.getMessageTime()
+                                        ).withTag(messageModel.getTag()));
+                                    } else {
+                                        otherFastAdapter.add(new MessageOtherAdapter(
+                                                messageModel.getMessage(),
+                                                messageModel.getMessageTime()
+                                        ).withTag(messageModel.getTag()));
+                                    }
+                                } else {
+
+                                    if (startMessage == false) {
+                                        otherFastAdapter.add(0, new MessageSelfAdapter(
+                                                messageModel.getMessage(),
+                                                messageModel.getMessageTime()
+                                        ).withTag(messageModel.getTag()));
+                                    } else {
+                                        otherFastAdapter.add(new MessageSelfAdapter(
+                                                messageModel.getMessage(),
+                                                messageModel.getMessageTime()
+                                        ).withTag(messageModel.getTag()));
+                                    }
+                                }
+                            }
+
+                            startPosition += limit;
+                            // activityMessageBinding.userMessage.smoothScrollToPosition(otherFastAdapter.getItemCount());
+                        }
+
+                        @Override
+                        public void onError(List<MessageModel> data) {
+
+                            for (MessageModel messageModel : data) {
+                                if (messageModel.isSelf() == false) {
+
+                                    otherFastAdapter.add(new MessageOtherAdapter(
+                                            messageModel.getMessage(),
+                                            messageModel.getMessageTime()
+                                    ).withTag(messageModel.getTag()));
+                                } else {
+
+                                    otherFastAdapter.add(new MessageSelfAdapter(
+                                            messageModel.getMessage(),
+                                            messageModel.getMessageTime()
+                                    ).withTag(messageModel.getTag()));
+                                }
+                            }
+
+                            startPosition += limit;
+                            //activityMessageBinding.userMessage.smoothScrollToPosition(otherFastAdapter.getItemCount());
+                        }
+                    });
+        }
     }
 
     private void setClipboard(Context context, String text) {
@@ -549,17 +620,26 @@ public class MessageActivity extends AppCompatActivity {
                             @Override
                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
 
+
+                                final MaterialDialog materialDialog1 = new MaterialDialog.Builder(MessageActivity.this)
+                                        .title("Clear Chat")
+                                        .content("Deleting All Messaged...")
+                                        .progress(true, 0)
+                                        .show();
                                 messageModelEntityManager.select().fromUser().equalsTo(contactAdapter.getNumber()).async(new Callback<List<MessageModel>>() {
                                     @Override
                                     public void onSuccess(List<MessageModel> data) {
+
                                         messageModelEntityManager.delete(data);
                                         otherFastAdapter.clear();
+                                        materialDialog1.dismiss();
                                     }
 
                                     @Override
                                     public void onError(List<MessageModel> data) {
                                         messageModelEntityManager.delete(data);
                                         otherFastAdapter.clear();
+                                        materialDialog1.dismiss();
                                     }
                                 });
                             }
