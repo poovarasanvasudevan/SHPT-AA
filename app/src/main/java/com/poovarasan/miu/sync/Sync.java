@@ -15,7 +15,7 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.poovarasan.miu.application.App;
 import com.poovarasan.miu.model.UserModel;
-import com.poovarasan.miu.model.UserModelEntityManager;
+import com.poovarasan.miu.parsemodel.User;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -65,22 +65,27 @@ public class Sync {
                 @Override
                 public void done(List<ParseUser> objects, ParseException e) {
 
-                    UserModelEntityManager userModelEntityManager = new UserModelEntityManager();
-                    userModelEntityManager.deleteAll();
+
+                    ParseQuery query = ParseQuery.getQuery(User.CLASS);
+                    query.fromLocalDatastore();
+                    query.findInBackground(new FindCallback<ParseObject>() {
+                        @Override
+                        public void done(List<ParseObject> objects, ParseException e) {
+                            ParseObject.unpinAllInBackground(objects);
+                        }
+                    });
 
                     if (objects != null && objects.size() > 0) {
                         List<UserModel> allUser = new ArrayList<UserModel>();
                         for (ParseUser parseUser : objects) {
                             if (parseUser.getUsername() != ParseUser.getCurrentUser().getUsername()) {
 
+                                ParseObject users = new ParseObject(User.CLASS);
+                                users.put(User.NUMBER, parseUser.getUsername());
+                                users.put(User.STATUS, parseUser.get("status"));
+
+
                                 String contact[] = getContact(context, parseUser.getUsername()).split(";");
-                                UserModel userModel = new UserModel();
-                                userModel.setActive(true);
-                                userModel.setNumber(parseUser.getUsername());
-                                userModel.setName(contact[0]);
-                                userModel.setStatus(parseUser.getString("status"));
-
-
                                 App.getStorage(context).getFile("Miu/Images/ProfilePic", parseUser.getUsername() + ".png").deleteOnExit();
 
                                 if (parseUser.getBytes("image") == null) {
@@ -90,7 +95,7 @@ public class Sync {
 
                                     File profilePic = App.getStorage(context).getFile("Miu/Images/ProfilePic", parseUser.getUsername() + ".png");
 
-                                    userModel.setImage(profilePic.getAbsolutePath());
+                                    users.put(User.IMAGE, profilePic.getAbsolutePath());
                                 } else {
 
                                     Log.i("ImageChage", parseUser.getUsername());
@@ -99,14 +104,14 @@ public class Sync {
                                             .createFile("Miu/Images/ProfilePic", parseUser.getUsername() + ".png", App.byteToBitmap(parseUser.getBytes("image")));
 
                                     File profilePic = App.getStorage(context).getFile("Miu/Images/ProfilePic", parseUser.getUsername() + ".png");
-                                    userModel.setImage(profilePic.getAbsolutePath());
+                                    users.put(User.IMAGE, profilePic.getAbsolutePath());
                                 }
 
-                                userModel.setContactId(Long.parseLong(contact[1]));
-                                allUser.add(userModel);
+                                users.put(User.NAME, getContactName(context, parseUser.getUsername()));
+                                users.put(User.USERID,parseUser.getObjectId());
+                                users.pinInBackground();
                             }
                         }
-                        userModelEntityManager.add(allUser);
                     }
                 }
             });
@@ -114,8 +119,6 @@ public class Sync {
     }
 
     public void syncUser(final String number) {
-        final UserModelEntityManager userModelEntityManager = new UserModelEntityManager();
-
         if (App.isOnline(context)) {
 
             ParseQuery query = ParseUser.getQuery();
@@ -124,9 +127,8 @@ public class Sync {
                 @Override
                 public void done(ParseObject object, ParseException e) {
                     if (e == null) {
-                        UserModel userModel = userModelEntityManager.select().number().equalsTo(number).first();
-                        userModel.setStatus(object.getString("STATUS"));
-
+                        ParseObject parseObject = new ParseObject(User.CLASS);
+                        parseObject.put(User.STATUS, object.getString("STATUS"));
                         App.getStorage(context).getFile("Miu/Images/ProfilePic", object.getString("username") + ".png").deleteOnExit();
 
                         if (object.getBytes("image") == null) {
@@ -136,7 +138,7 @@ public class Sync {
 
                             File profilePic = App.getStorage(context).getFile("Miu/Images/ProfilePic", object.getString("username") + ".png");
 
-                            userModel.setImage(profilePic.getAbsolutePath());
+                            parseObject.put(User.IMAGE, profilePic.getAbsolutePath());
                         } else {
 
                             Log.i("ImageChage", object.getString("username"));
@@ -145,10 +147,10 @@ public class Sync {
                                     .createFile("Miu/Images/ProfilePic", object.getString("username") + ".png", App.byteToBitmap(object.getBytes("image")));
 
                             File profilePic = App.getStorage(context).getFile("Miu/Images/ProfilePic", object.getString("username") + ".png");
-                            userModel.setImage(profilePic.getAbsolutePath());
+                            parseObject.put(User.IMAGE, profilePic.getAbsolutePath());
                         }
 
-                        userModelEntityManager.update(userModel);
+                        parseObject.pinInBackground();
                     }
                 }
 

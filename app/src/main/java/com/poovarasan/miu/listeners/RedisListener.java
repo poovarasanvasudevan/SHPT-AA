@@ -15,17 +15,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 
+import com.parse.CountCallback;
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.poovarasan.miu.R;
 import com.poovarasan.miu.activity.MessageActivity;
 import com.poovarasan.miu.adapter.ContactAdapter;
 import com.poovarasan.miu.application.App;
 import com.poovarasan.miu.event.TextMessageEvent;
-import com.poovarasan.miu.model.MessageModel;
 import com.poovarasan.miu.model.MessageModelEntityManager;
 import com.poovarasan.miu.model.RecentMessagesEntityManager;
-import com.poovarasan.miu.model.UserModel;
-import com.poovarasan.miu.model.UserModelEntityManager;
+import com.poovarasan.miu.parsemodel.Message;
+import com.poovarasan.miu.parsemodel.User;
 import com.sromku.simple.storage.Storage;
 
 import org.greenrobot.eventbus.EventBus;
@@ -81,16 +85,17 @@ public class RedisListener extends JedisPubSub {
                         case "TEXT": {
 
                             String tag = from + "_" + new Random(999999999) + "_" + time;
-                            MessageModel messageModel = new MessageModel();
-                            messageModel.setFromUser(from);
-                            messageModel.setMessageTime(time);
-                            messageModel.setSelf(false);
-                            messageModel.setMessageType(messageType);
-                            messageModel.setTag(tag);
-                            messageModel.setMessage(jsonObject.optString("message"));
-                            messageModelEntityManager.add(messageModel);
+                            ParseObject parseObject = new ParseObject(Message.CLASS);
+                            parseObject.put(Message.FROM, from);
+                            parseObject.put(Message.TIME, time);
+                            parseObject.put(Message.ISSELF, false);
+                            parseObject.put(Message.UNIQUEID, tag);
+                            parseObject.put(Message.MESSAGETYPE, messageType);
+                            parseObject.put(Message.MESSAGE, jsonObject.optString("message"));
+                            parseObject.pinInBackground();
 
-                            App.addToRecent(from,jsonObject.optString("message"));
+
+                            App.addToRecent(from, jsonObject.optString("message"));
 
 
                             EventBus.getDefault().post(new TextMessageEvent(
@@ -116,14 +121,17 @@ public class RedisListener extends JedisPubSub {
                             storage.createFile(PATH, NAME, bitmap);
                             String filePath = App.getStorage(context).getFile(PATH, NAME).getAbsolutePath();
 
-                            MessageModel messageModel = new MessageModel();
-                            messageModel.setFromUser(from);
-                            messageModel.setMessageTime(time);
-                            messageModel.setSelf(false);
-                            messageModel.setTag(from + "_" + new Random(999999999) + "_" + time);
-                            messageModel.setMessageType(messageType);
-                            messageModel.setImagePath(filePath);
-                            messageModelEntityManager.add(messageModel);
+                            String tag = from + "_" + new Random(999999999) + "_" + time;
+                            ParseObject parseObject = new ParseObject(Message.CLASS);
+                            parseObject.put(Message.FROM, from);
+                            parseObject.put(Message.TIME, time);
+                            parseObject.put(Message.ISSELF, false);
+                            parseObject.put(Message.UNIQUEID, tag);
+                            parseObject.put(Message.MESSAGETYPE, messageType);
+                            parseObject.put(Message.IMAGEPATH, filePath);
+                            parseObject.put(Message.MESSAGE, jsonObject.optString("message"));
+                            parseObject.pinInBackground();
+
                             break;
                         }
                         case "VIDEO": {
@@ -230,62 +238,78 @@ public class RedisListener extends JedisPubSub {
         return super.getSubscribedChannels();
     }
 
-    public void notifyMe(String message, Context context) {
+    public void notifyMe(String message, final Context context) {
 
-        UserModelEntityManager userModelEntityManager = new UserModelEntityManager();
         JSONObject jsonObject = null;
         try {
             jsonObject = new JSONObject(message);
 
-            int userCount = userModelEntityManager.select().number().equalsTo(jsonObject.optString("from")).count();
+            ParseQuery parseQuery = new ParseQuery(User.CLASS);
+            parseQuery.whereEqualTo(User.NUMBER, jsonObject.optString("from"));
+            final JSONObject finalJsonObject = jsonObject;
+            parseQuery.countInBackground(new CountCallback() {
+                @Override
+                public void done(int count, ParseException e) {
+                    if (count > 0) {
+                        ParseQuery parseQuery = new ParseQuery(User.CLASS);
+                        parseQuery.whereEqualTo(User.NUMBER, finalJsonObject.optString("from"));
+                        parseQuery.getFirstInBackground(new GetCallback() {
+                            @Override
+                            public void done(ParseObject object, ParseException e) {
+                                Intent intent = new Intent(context, MessageActivity.class);
+                                intent.putExtra("contactDetails", new ContactAdapter(
+                                        object.getString(User.IMAGE),
+                                        object.getString(User.NAME),
+                                        object.getString(User.STATUS),
+                                        object.getString(User.NUMBER),
+                                        context
+                                ));
+                                PendingIntent pendingIntent = PendingIntent.getActivity(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                                PugNotification.with(context)
+                                        .load()
+                                        .title(object.getString(User.NUMBER) + " sent you a message...")
+                                        .bigTextStyle(finalJsonObject.optString("message"))
+                                        .smallIcon(R.drawable.ic_whatsapp)
+                                        .largeIcon(R.drawable.miublue)
+                                        .flags(Notification.DEFAULT_ALL)
+                                        .vibrate(new long[]{1000L, 200L, 300L})
+                                        .button(R.drawable.ic_reply, "reply", pendingIntent)
+                                        .simple()
+                                        .build();
+                            }
 
-            if (userCount > 0) {
-                UserModel userModel = userModelEntityManager.select().number().equalsTo(jsonObject.optString("from")).first();
+                            @Override
+                            public void done(Object o, Throwable throwable) {
 
+                            }
+                        });
 
-                Intent intent = new Intent(context, MessageActivity.class);
-                intent.putExtra("contactDetails", new ContactAdapter(
-                        userModel.getImage(),
-                        userModel.getName(),
-                        userModel.getStatus(),
-                        userModel.getNumber(),
-                        context
-                ));
-                PendingIntent pendingIntent = PendingIntent.getActivity(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-                PugNotification.with(context)
-                        .load()
-                        .title(userModel.getNumber() + " sent you a message...")
-                        .bigTextStyle(jsonObject.optString("message"))
-                        .smallIcon(R.drawable.ic_whatsapp)
-                        .largeIcon(R.drawable.miublue)
-                        .flags(Notification.DEFAULT_ALL)
-                        .vibrate(new long[]{1000L, 200L, 300L})
-                        .button(R.drawable.ic_reply, "reply", pendingIntent)
-                        .simple()
-                        .build();
-            } else {
-                Intent intent = new Intent(context, MessageActivity.class);
-                intent.putExtra("contactDetails", new ContactAdapter(
-                        App.getDefaultImagePath(context),
-                        jsonObject.optString("from"),
-                        jsonObject.optString("from"),
-                        jsonObject.optString("from"),
-                        context
-                ));
+                    } else {
+                        Intent intent = new Intent(context, MessageActivity.class);
+                        intent.putExtra("contactDetails", new ContactAdapter(
+                                App.getDefaultImagePath(context),
+                                finalJsonObject.optString("from"),
+                                finalJsonObject.optString("from"),
+                                finalJsonObject.optString("from"),
+                                context
+                        ));
 
-                PendingIntent pendingIntent = PendingIntent.getActivity(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-                PugNotification.with(context)
-                        .load()
-                        .title(jsonObject.optString("from") + " sent you a message...")
-                        .bigTextStyle(jsonObject.optString("message"))
-                        .smallIcon(R.drawable.ic_whatsapp)
-                        .largeIcon(R.drawable.miublue)
-                        .flags(Notification.DEFAULT_ALL)
-                        .vibrate(new long[]{1000L, 200L, 300L})
-                        .button(R.drawable.ic_reply, "reply", pendingIntent)
-                        .simple()
-                        .build();
-            }
+                        PendingIntent pendingIntent = PendingIntent.getActivity(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                        PugNotification.with(context)
+                                .load()
+                                .title(finalJsonObject.optString("from") + " sent you a message...")
+                                .bigTextStyle(finalJsonObject.optString("message"))
+                                .smallIcon(R.drawable.ic_whatsapp)
+                                .largeIcon(R.drawable.miublue)
+                                .flags(Notification.DEFAULT_ALL)
+                                .vibrate(new long[]{1000L, 200L, 300L})
+                                .button(R.drawable.ic_reply, "reply", pendingIntent)
+                                .simple()
+                                .build();
+                    }
+                }
+            });
+
 
         } catch (JSONException e) {
             e.printStackTrace();

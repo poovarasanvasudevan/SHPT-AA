@@ -11,12 +11,17 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
+import com.parse.CountCallback;
+import com.parse.GetCallback;
 import com.parse.Parse;
+import com.parse.ParseException;
 import com.parse.ParseInstallation;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.poovarasan.miu.R;
-import com.poovarasan.miu.model.RecentMessages;
 import com.poovarasan.miu.model.RecentMessagesEntityManager;
+import com.poovarasan.miu.parsemodel.Recent;
 import com.poovarasan.miu.service.RedisService;
 import com.sromku.simple.storage.SimpleStorage;
 import com.sromku.simple.storage.Storage;
@@ -89,20 +94,40 @@ public class App extends Application {
         }
     }
 
-    public static void addToRecent(String number, String message) {
-        int isUserExists = recentMessagesEntityManager.select().numbers().equalsTo(number).count();
-        if (isUserExists == 0) {
-            RecentMessages recentMessages = new RecentMessages();
-            recentMessages.setNumbers(number);
-            recentMessages.setRecentMessage(message);
-            recentMessages.setUpdatedTime(new Date());
-            recentMessagesEntityManager.add(recentMessages);
-        } else {
-            RecentMessages recentMessages = recentMessagesEntityManager.select().numbers().equalsTo(number).first();
-            recentMessages.setUpdatedTime(new Date());
-            recentMessages.setRecentMessage(message);
-            recentMessagesEntityManager.update(recentMessages);
-        }
+    public static void addToRecent(final String number, final String message) {
+        final ParseQuery parseQuery = new ParseQuery(Recent.CLASS);
+        parseQuery.whereEqualTo(Recent.NUMBER, number);
+        parseQuery.countInBackground(new CountCallback() {
+            @Override
+            public void done(int count, ParseException e) {
+                if (e == null) {
+                    if (count == 0) {
+                        ParseObject parseObject = new ParseObject(Recent.CLASS);
+                        parseObject.put(Recent.NUMBER, number);
+                        parseObject.put(Recent.MESSAGE, message);
+                        parseObject.put(Recent.TIME, new Date());
+                        parseObject.pinInBackground();
+                    } else {
+                        ParseQuery parseQuery1 = new ParseQuery(Recent.CLASS);
+                        parseQuery1.whereEqualTo(Recent.NUMBER, number);
+                        parseQuery1.getFirstInBackground(new GetCallback() {
+                            @Override
+                            public void done(ParseObject object, ParseException e) {
+                                object.put(Recent.TIME, new Date());
+                                object.put(Recent.MESSAGE, message);
+                                object.pinInBackground();
+                            }
+
+                            @Override
+                            public void done(Object o, Throwable throwable) {
+
+                            }
+                        });
+
+                    }
+                }
+            }
+        });
     }
 
     public static void setOnline() {

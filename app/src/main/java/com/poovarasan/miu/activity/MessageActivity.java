@@ -38,6 +38,12 @@ import com.mikepenz.fastadapter_extensions.ActionModeHelper;
 import com.mikepenz.fastadapter_extensions.UndoHelper;
 import com.mikepenz.fastadapter_extensions.items.ProgressItem;
 import com.mikepenz.materialize.MaterializeBuilder;
+import com.parse.CountCallback;
+import com.parse.FindCallback;
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.poovarasan.miu.R;
 import com.poovarasan.miu.adapter.ContactAdapter;
@@ -47,10 +53,10 @@ import com.poovarasan.miu.application.App;
 import com.poovarasan.miu.databinding.ActivityMessageBinding;
 import com.poovarasan.miu.event.TextMessageEvent;
 import com.poovarasan.miu.model.MessageModel;
-import com.poovarasan.miu.model.MessageModelColumns;
 import com.poovarasan.miu.model.MessageModelEntityManager;
-import com.poovarasan.miu.model.UserModel;
 import com.poovarasan.miu.model.UserModelEntityManager;
+import com.poovarasan.miu.parsemodel.Message;
+import com.poovarasan.miu.parsemodel.User;
 import com.poovarasan.miu.sync.Sync;
 import com.sromku.simple.storage.Storage;
 
@@ -70,8 +76,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import fr.xebia.android.freezer.Freezer;
-import fr.xebia.android.freezer.QueryLogger;
 import fr.xebia.android.freezer.async.Callback;
 import hani.momanii.supernova_emoji_library.Actions.EmojIconActions;
 import pl.aprilapps.easyphotopicker.DefaultCallback;
@@ -316,105 +320,84 @@ public class MessageActivity extends AppCompatActivity {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
 
-            UserModel userModel = userModelEntityManager.select().number().equalsTo(contactAdapter.getNumber()).first();
-            activityMessageBinding.toolBarSubtitle.setText("Online");
-            Glide.with(getApplicationContext())
-                    .load(new File(userModel.getImage()))
-                    .into(activityMessageBinding.toolbarProfileImage);
+            ParseQuery parseQuery = new ParseQuery(User.CLASS);
+            parseQuery.whereEqualTo(User.NUMBER, contactAdapter.getNumber());
+            parseQuery.getFirstInBackground(new GetCallback() {
+                @Override
+                public void done(ParseObject object, ParseException e) {
+                    activityMessageBinding.toolBarSubtitle.setText("Online");
+                    Glide.with(getApplicationContext())
+                            .load(new File(object.getString(User.IMAGE)))
+                            .into(activityMessageBinding.toolbarProfileImage);
+                }
+
+                @Override
+                public void done(Object o, Throwable throwable) {
+
+                }
+            });
         }
     }
 
 
     public void loadNext(final boolean startMessage) {
 
-        Log.i("LoadingData", startPosition + "...Loading");
-        messageModelEntityManager.logQueries(new QueryLogger() {
+
+        final ParseQuery parseObject = new ParseQuery(Message.CLASS);
+        parseObject.fromLocalDatastore();
+        parseObject.whereEqualTo(Message.FROM, contactAdapter.getNumber());
+        parseObject.countInBackground(new CountCallback() {
             @Override
-            public void onQuery(String query, String[] datas) {
-                Log.d("MESSAGELOG", query);
-            }
-        });
-
-        Freezer.getInstance().getDatabase();
-
-
-        int count = messageModelEntityManager
-                .select()
-                .fromUser()
-                .equalsTo(contactAdapter.getNumber())
-                .sortDesc(MessageModelColumns.id)
-                .count();
-
-        if (count > startPosition) {
-            messageModelEntityManager
-                    .select()
-                    .fromUser()
-                    .equalsTo(contactAdapter.getNumber())
-                    .sortDesc(MessageModelColumns.id)
-                    .limit(startPosition, limit)
-                    .async(new Callback<List<MessageModel>>() {
+            public void done(int count, ParseException e) {
+                if (count > startPosition) {
+                    ParseQuery parseQuery = new ParseQuery(Message.CLASS);
+                    parseQuery.fromLocalDatastore();
+                    parseQuery.whereEqualTo(Message.FROM, contactAdapter.getNumber());
+                    parseObject.addDescendingOrder(Message.TIME);
+                    parseObject.setSkip(startPosition);
+                    parseObject.setLimit(limit);
+                    parseObject.findInBackground(new FindCallback<ParseObject>() {
                         @Override
-                        public void onSuccess(List<MessageModel> data) {
-                            for (MessageModel messageModel : data) {
-
-                                Log.i("IdValue:", messageModel.getId() + "-->");
-                                if (messageModel.isSelf() == false) {
+                        public void done(List<ParseObject> objects, ParseException e) {
+                            for (ParseObject parseObject1 : objects) {
+                                if (parseObject1.getBoolean(Message.ISSELF) == false) {
 
                                     if (startMessage == false) {
+
                                         otherFastAdapter.add(0, new MessageOtherAdapter(
-                                                messageModel.getMessage(),
-                                                messageModel.getMessageTime()
-                                        ).withTag(messageModel.getTag()));
+                                                parseObject1.getString(Message.MESSAGE),
+                                                parseObject1.getDate(Message.TIME).getTime()
+                                        ).withTag(parseObject1.getString(Message.UNIQUEID)));
                                     } else {
+
                                         otherFastAdapter.add(0, new MessageOtherAdapter(
-                                                messageModel.getMessage(),
-                                                messageModel.getMessageTime()
-                                        ).withTag(messageModel.getTag()));
+                                                parseObject1.getString(Message.MESSAGE),
+                                                parseObject1.getDate(Message.TIME).getTime()
+                                        ).withTag(parseObject1.getString(Message.UNIQUEID)));
                                     }
                                 } else {
 
                                     if (startMessage == false) {
+
                                         otherFastAdapter.add(0, new MessageSelfAdapter(
-                                                messageModel.getMessage(),
-                                                messageModel.getMessageTime()
-                                        ).withTag(messageModel.getTag()));
+                                                parseObject1.getString(Message.MESSAGE),
+                                                parseObject1.getDate(Message.TIME).getTime()
+                                        ).withTag(parseObject1.getString(Message.UNIQUEID)));
                                     } else {
+
                                         otherFastAdapter.add(0, new MessageSelfAdapter(
-                                                messageModel.getMessage(),
-                                                messageModel.getMessageTime()
-                                        ).withTag(messageModel.getTag()));
+                                                parseObject1.getString(Message.MESSAGE),
+                                                parseObject1.getDate(Message.TIME).getTime()
+                                        ).withTag(parseObject1.getString(Message.UNIQUEID)));
                                     }
                                 }
                             }
-
                             startPosition += limit;
-                            // activityMessageBinding.userMessage.smoothScrollToPosition(otherFastAdapter.getItemCount());
-                        }
-
-                        @Override
-                        public void onError(List<MessageModel> data) {
-
-                            for (MessageModel messageModel : data) {
-                                if (messageModel.isSelf() == false) {
-
-                                    otherFastAdapter.add(new MessageOtherAdapter(
-                                            messageModel.getMessage(),
-                                            messageModel.getMessageTime()
-                                    ).withTag(messageModel.getTag()));
-                                } else {
-
-                                    otherFastAdapter.add(new MessageSelfAdapter(
-                                            messageModel.getMessage(),
-                                            messageModel.getMessageTime()
-                                    ).withTag(messageModel.getTag()));
-                                }
-                            }
-
-                            startPosition += limit;
-                            //activityMessageBinding.userMessage.smoothScrollToPosition(otherFastAdapter.getItemCount());
                         }
                     });
-        }
+                }
+            }
+        });
     }
 
     private void setClipboard(Context context, String text) {
